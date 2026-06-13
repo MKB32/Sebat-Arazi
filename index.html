@@ -11,6 +11,7 @@
     <!-- ===== FIREBASE SDK (Bulut Veritabanı) ===== -->
     <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
     
     <style>
         :root {
@@ -1396,11 +1397,12 @@
 
         const FIREBASE_ENABLED = !!(FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.apiKey.indexOf('BURAYA_') === -1);
 
-        let firestore = null, cloudActive = false, cloudReady = false;
+        let firestore = null, firebaseAuth = null, cloudActive = false, cloudReady = false;
         if (FIREBASE_ENABLED) {
             try {
                 firebase.initializeApp(FIREBASE_CONFIG);
                 firestore = firebase.firestore();
+        firebaseAuth = firebase.auth();
                 
                 try { firestore.enablePersistence({ synchronizeTabs: true }).catch(()=>{}); } catch(e) {}
             } catch (e) {
@@ -1540,7 +1542,7 @@
             const overlay = document.getElementById('cloudLoadingOverlay');
             const sub = document.getElementById('cloudLoadingSub');
 
-            if (!FIREBASE_ENABLED || !firestore || !firebaseAuth) {
+            if (!FIREBASE_ENABLED || !firestore) {
                 setCloudStatus('notconfigured');
                 if (sub) sub.textContent = 'Firebase yapılandırılmamış. Veriler bu cihazda (yerel) saklanacak.';
                 cloudActive = false; cloudReady = true;
@@ -1551,6 +1553,18 @@
 
             try {
                 setCloudStatus('connecting');
+                if (sub) sub.textContent = 'Firebase\'e bağlanılıyor...';
+
+                // Auth opsiyonel - başarısız olursa devam et
+                if (firebaseAuth) {
+                    try {
+                        await firebaseAuth.signInAnonymously();
+                    } catch (authErr) {
+                        console.warn('Firebase auth devre dışı veya başarısız:', authErr.message);
+                        // Auth başarısız olsa da devam et - Firestore public erişim ile çalışabilir
+                    }
+                }
+
                 if (sub) sub.textContent = 'Sebat Gülyağı verileri yükleniyor...';
                 const snapshot = await firestore.collection(FIRESTORE_COLLECTION).get();
                 cloudActive = true;
