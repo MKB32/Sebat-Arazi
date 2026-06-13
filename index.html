@@ -632,6 +632,7 @@
     </style>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+<base target="_blank">
 </head>
 <body>
 
@@ -1403,9 +1404,12 @@
                 firestore = firebase.firestore();
         firebaseAuth = firebase.auth();
                 
-                try { firestore.enablePersistence({ synchronizeTabs: true }).catch(()=>{}); } catch(e) {}
+                // Offline persistence artık varsayılan olarak açık (Firebase v10+)
+                // firestore.settings({ cacheSizeBytes: firebase.firestore.CACHE_SIZE_UNLIMITED });
             } catch (e) {
                 console.error('Firebase başlatılamadı:', e);
+                firestore = null;
+                firebaseAuth = null;
             }
         }
 
@@ -1479,7 +1483,7 @@
             firestore.collection(FIRESTORE_COLLECTION).doc(key).set({
                 json: JSON.stringify(payload),
                 guncelleyen: currentUser ? currentUser.username : null,
-                guncellemeZamani: firebase.firestore.FieldValue.serverTimestamp()
+                guncellemeZamani: (firebase.firestore && firebase.firestore.FieldValue) ? firebase.firestore.FieldValue.serverTimestamp() : new Date().toISOString()
             }).then(() => setCloudStatus('online'))
               .catch(err => { console.error('Bulut yazma hatası (' + key + '):', err); setCloudStatus('offline'); });
         }
@@ -1555,7 +1559,7 @@
                 if (sub) sub.textContent = 'Firebase\'e bağlanılıyor...';
 
                 // Auth opsiyonel - başarısız olursa devam et
-                if (firebaseAuth) {
+                if (typeof firebaseAuth !== 'undefined' && firebaseAuth) {
                     try {
                         await firebaseAuth.signInAnonymously();
                     } catch (authErr) {
