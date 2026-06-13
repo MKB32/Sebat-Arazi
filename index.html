@@ -1323,6 +1323,18 @@
                 firestore = firebase.firestore();
                 firebaseAuth = firebase.auth();
                 try { firestore.enablePersistence({ synchronizeTabs: true }).catch(()=>{}); } catch(e) {}
+            // Note: enableMultiTabIndexedDbPersistence is deprecated, using settings instead
+            try { 
+                if (firestore.settings) {
+                    firestore.settings({ cacheSizeBytes: firebase.firestore.CACHE_SIZE_UNLIMITED });
+                }
+            } catch(e) {}
+            // Note: enableMultiTabIndexedDbPersistence is deprecated in newer versions, using cache setting instead
+            try { 
+                if (firestore.settings) {
+                    firestore.settings({ cacheSizeBytes: firebase.firestore.CACHE_SIZE_UNLIMITED });
+                }
+            } catch(e) {}
             } catch (e) {
                 console.error('Firebase başlatılamadı:', e);
             }
@@ -1472,7 +1484,19 @@
             try {
                 setCloudStatus('connecting');
                 if (sub) sub.textContent = 'Firebase\'e bağlanılıyor ve oturum açılıyor...';
-                await firebaseAuth.signInAnonymously();
+
+                // Anonymous auth dene, başarısız olursa local moda geç
+                try {
+                    await firebaseAuth.signInAnonymously();
+                } catch (authErr) {
+                    console.warn('Firebase anonim oturum açılamadı:', authErr.message);
+                    if (sub) sub.textContent = 'Firebase oturumu açılamadı. Yerel moda geçiliyor...';
+                    cloudActive = false; cloudReady = true;
+                    setCloudStatus('offline');
+                    initData();
+                    setTimeout(() => overlay && overlay.classList.add('hidden'), 500);
+                    return;
+                }
 
                 if (sub) sub.textContent = 'Sebat Gülyağı verileri yükleniyor...';
                 const snapshot = await firestore.collection(FIRESTORE_COLLECTION).get();
