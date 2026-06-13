@@ -147,12 +147,182 @@
         .alert-info { background: #dbeafe; color: #1e40af; border-left: 4px solid #3b82f6; }
 
         .mobile-toggle { display: none; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--dark); }
-        @media (max-width: 768px) {
-            .sidebar { transform: translateX(-100%); }
+        /* ========== TABLET (769px - 1024px) ========== */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .sidebar { width: 240px; }
+            .main-content { margin-left: 240px; }
+            .content { padding: 20px; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+            .form-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+            .yevmiye-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+            .is-turu-grid { grid-template-columns: repeat(2, 1fr); }
+            .page-title { font-size: 1.25rem; }
+            .topbar { padding: 12px 20px; }
+            .card-header { padding: 16px 20px; }
+            .modal { max-width: 700px; }
+            .terminal-body { padding: 16px; max-width: 100%; }
+            .scanner-icon { width: 70px; height: 70px; font-size: 1.75rem; }
+        }
+
+        /* ========== TELEFON (481px - 768px) ========== */
+        @media (min-width: 481px) and (max-width: 768px) {
+            .sidebar { width: 280px; transform: translateX(-100%); }
             .sidebar.open { transform: translateX(0); }
             .main-content { margin-left: 0; }
+            .content { padding: 16px; }
             .mobile-toggle { display: block; }
-            .stats-grid { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+            .stat-card { padding: 16px; }
+            .stat-value { font-size: 1.5rem; }
+            .stat-icon { width: 40px; height: 40px; font-size: 1rem; }
+            .page-title { font-size: 1.15rem; }
+            .topbar { padding: 12px 16px; }
+            .topbar-actions { gap: 8px; }
+            .btn { padding: 8px 14px; font-size: 0.8rem; }
+            .form-grid { grid-template-columns: 1fr; gap: 14px; padding: 16px; }
+            .yevmiye-grid { grid-template-columns: 1fr; gap: 14px; padding: 16px; }
+            .is-turu-grid { grid-template-columns: repeat(2, 1fr); }
+            th, td { padding: 12px 14px; font-size: 0.82rem; }
+            .card-header { padding: 14px 16px; flex-wrap: wrap; gap: 8px; }
+            .card-title { font-size: 1rem; }
+            .modal { width: 92%; max-width: 600px; }
+            .terminal-body { padding: 14px; }
+            .terminal-scanner { padding: 18px; }
+            .scanner-icon { width: 64px; height: 64px; font-size: 1.6rem; }
+            .scanner-text { font-size: 1.05rem; }
+            .terminal-input { padding: 12px; font-size: 0.95rem; }
+            .terminal-btn-scan { padding: 12px; font-size: 0.95rem; }
+            .cloud-status, .current-user-badge { font-size: 0.72rem; padding: 4px 10px; }
+            .action-btns { flex-wrap: wrap; }
+        }
+
+        /* ========== KÜÇÜK TELEFON (360px - 480px) ========== */
+        @media (min-width: 361px) and (max-width: 480px) {
+            .sidebar { width: 260px; transform: translateX(-100%); }
+            .sidebar.open { transform: translateX(0); }
+            .main-content { margin-left: 0; }
+            .content { padding: 12px; }
+            .mobile-toggle { display: block; font-size: 1.25rem; }
+            .stats-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+            .stat-card { padding: 14px; gap: 10px; }
+            .stat-icon { width: 36px; height: 36px; font-size: 0.9rem; }
+            .stat-value { font-size: 1.3rem; }
+            .stat-label { font-size: 0.75rem; }
+            .page-title { font-size: 1.05rem; }
+            .topbar { padding: 10px 12px; }
+            .topbar-actions { gap: 6px; }
+            .btn { padding: 6px 12px; font-size: 0.75rem; }
+            .btn-icon { width: 36px; height: 36px; }
+            .form-grid { grid-template-columns: 1fr; gap: 12px; padding: 14px; }
+            .yevmiye-grid { grid-template-columns: 1fr; gap: 12px; padding: 14px; }
+            .is-turu-grid { grid-template-columns: 1fr 1fr; }
+            th, td { padding: 10px 12px; font-size: 0.78rem; }
+            .card-header { padding: 12px 14px; }
+            .card-title { font-size: 0.95rem; }
+            .modal { width: 95%; margin: 10px; }
+            .modal-body { padding: 16px; }
+            .modal-footer { padding: 12px 16px; }
+            .terminal-body { padding: 12px; }
+            .terminal-scanner { padding: 16px; }
+            .scanner-icon { width: 56px; height: 56px; font-size: 1.4rem; }
+            .scanner-text { font-size: 0.95rem; }
+            .scanner-sub { font-size: 0.8rem; }
+            .terminal-input { padding: 10px; font-size: 0.9rem; }
+            .terminal-btn-scan { padding: 10px; font-size: 0.85rem; }
+            .terminal-is-turu h3 { font-size: 0.8rem; }
+            .is-turu-btn { padding: 10px; font-size: 0.8rem; }
+            .cloud-status, .current-user-badge { font-size: 0.68rem; padding: 3px 8px; }
+            .terminal-list-header { padding: 12px 14px; }
+            .terminal-list-item { padding: 10px 14px; }
+            .list-item-name { font-size: 0.85rem; }
+            .list-item-meta { font-size: 0.72rem; }
+            .action-btns { gap: 4px; }
+            .badge { padding: 3px 8px; font-size: 0.7rem; }
+        }
+
+        /* ========== ÇOK KÜÇÜK TELEFON (max 360px) ========== */
+        @media (max-width: 360px) {
+            .sidebar { width: 240px; transform: translateX(-100%); }
+            .sidebar.open { transform: translateX(0); }
+            .main-content { margin-left: 0; }
+            .content { padding: 8px; }
+            .mobile-toggle { display: block; font-size: 1.2rem; }
+            .stats-grid { grid-template-columns: 1fr; gap: 8px; }
+            .stat-card { padding: 12px; gap: 8px; }
+            .stat-icon { width: 32px; height: 32px; font-size: 0.85rem; }
+            .stat-value { font-size: 1.2rem; }
+            .stat-label { font-size: 0.72rem; }
+            .page-title { font-size: 1rem; }
+            .topbar { padding: 8px 10px; }
+            .topbar-actions { gap: 4px; flex-wrap: wrap; }
+            .btn { padding: 5px 10px; font-size: 0.72rem; }
+            .btn-icon { width: 32px; height: 32px; }
+            .form-grid { grid-template-columns: 1fr; gap: 10px; padding: 12px; }
+            .yevmiye-grid { grid-template-columns: 1fr; gap: 10px; padding: 12px; }
+            .is-turu-grid { grid-template-columns: 1fr; }
+            th, td { padding: 8px 10px; font-size: 0.75rem; }
+            .card-header { padding: 10px 12px; flex-wrap: wrap; gap: 6px; }
+            .card-title { font-size: 0.9rem; }
+            .modal { width: 96%; margin: 8px; }
+            .modal-body { padding: 12px; }
+            .modal-footer { padding: 10px 12px; }
+            .terminal-body { padding: 10px; }
+            .terminal-scanner { padding: 14px; }
+            .scanner-icon { width: 52px; height: 52px; font-size: 1.3rem; }
+            .scanner-text { font-size: 0.9rem; }
+            .scanner-sub { font-size: 0.75rem; }
+            .terminal-input { padding: 8px; font-size: 0.85rem; }
+            .terminal-btn-scan { padding: 8px; font-size: 0.8rem; }
+            .terminal-is-turu h3 { font-size: 0.75rem; }
+            .is-turu-btn { padding: 8px; font-size: 0.75rem; }
+            .cloud-status, .current-user-badge { font-size: 0.65rem; padding: 2px 6px; }
+            .terminal-list-header { padding: 10px 12px; }
+            .terminal-list-header h3 { font-size: 0.9rem; }
+            .terminal-list-item { padding: 8px 12px; }
+            .list-item-name { font-size: 0.8rem; }
+            .list-item-meta { font-size: 0.68rem; }
+            .action-btns { gap: 3px; }
+            .badge { padding: 2px 6px; font-size: 0.68rem; }
+            .login-box { padding: 24px; max-width: 340px; }
+            .login-logo { font-size: 2rem; }
+            .login-title { font-size: 1.25rem; }
+            .login-subtitle { font-size: 0.8rem; }
+            .login-input { padding: 10px 12px; font-size: 0.9rem; }
+            .login-btn { padding: 10px; font-size: 0.9rem; }
+            .kontrol-avatar { width: 60px; height: 60px; font-size: 1.5rem; }
+            .kontrol-isim { font-size: 1rem; }
+            .kontrol-detay { grid-template-columns: 1fr; gap: 8px; }
+            .kontrol-detay-value { font-size: 0.95rem; }
+        }
+
+        /* ========== YATAY MOD (LANDSCAPE) ========== */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .sidebar { width: 220px; }
+            .sidebar-header { padding: 12px; }
+            .sidebar-header h1 { font-size: 1rem; }
+            .nav-item { padding: 6px 10px; font-size: 0.8rem; }
+            .content { padding: 10px; }
+            .stats-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+            .stat-card { padding: 8px; }
+            .stat-icon { width: 32px; height: 32px; font-size: 0.85rem; }
+            .stat-value { font-size: 1.1rem; }
+            .terminal-body { padding: 8px; }
+            .terminal-scanner { padding: 10px; }
+            .scanner-icon { width: 48px; height: 48px; font-size: 1.2rem; }
+            .modal { max-height: 85vh; }
+            .yevmiye-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 12px; }
+        }
+
+        /* ========== TABLET YATAY (1025px - 1366px) ========== */
+        @media (min-width: 1025px) and (max-width: 1366px) {
+            .sidebar { width: 260px; }
+            .main-content { margin-left: 260px; }
+            .content { padding: 24px; }
+            .stats-grid { grid-template-columns: repeat(3, 1fr); gap: 18px; }
+            .form-grid { grid-template-columns: repeat(2, 1fr); gap: 18px; }
+            .yevmiye-grid { grid-template-columns: repeat(2, 1fr); gap: 18px; }
+            .is-turu-grid { grid-template-columns: repeat(3, 1fr); }
+            .modal { max-width: 720px; }
         }
 
         .hidden { display: none !important; }
@@ -428,10 +598,7 @@
             padding: 12px 16px; margin-bottom: 12px; font-size: 0.875rem; color: #92400e;
         }
 
-        @media (max-width: 768px) {
-            .is-turu-grid { grid-template-columns: 1fr; }
-            .terminal-body { padding: 12px; }
-        }
+        /* Terminal responsive ayarları alt bloklarda mevcut */
 
         
         /* ========== MOBILE & TABLET RESPONSIVE STYLES ========== */
@@ -442,92 +609,6 @@
             -webkit-tap-highlight-color: transparent;
             touch-action: manipulation;
             min-height: 44px;
-        }
-
-        @media (max-width: 360px) {
-            .sidebar { width: 260px; }
-            .main-content { margin-left: 0; }
-            .content { padding: 12px; }
-            .stats-grid { grid-template-columns: 1fr; gap: 10px; }
-            .stat-card { padding: 14px; }
-            .stat-value { font-size: 1.4rem; }
-            .page-title { font-size: 1.1rem; }
-            .topbar { padding: 10px 14px; }
-            .btn { padding: 8px 14px; font-size: 0.8rem; }
-            .form-grid { grid-template-columns: 1fr; gap: 12px; padding: 16px; }
-            .yevmiye-grid { grid-template-columns: 1fr; gap: 12px; padding: 16px; }
-            th, td { padding: 10px 12px; font-size: 0.8rem; }
-            .card-header { padding: 14px 16px; flex-wrap: wrap; gap: 8px; }
-            .card-title { font-size: 1rem; }
-            .terminal-body { padding: 12px; }
-            .terminal-scanner { padding: 16px; }
-            .scanner-icon { width: 60px; height: 60px; font-size: 1.5rem; }
-            .scanner-text { font-size: 1rem; }
-            .is-turu-grid { grid-template-columns: 1fr; }
-            .modal { width: 95%; margin: 10px; }
-            .modal-body { padding: 16px; }
-            .cloud-status, .current-user-badge { font-size: 0.7rem; padding: 4px 10px; }
-            .terminal-input { padding: 12px; font-size: 0.9rem; }
-            .terminal-btn-scan { padding: 12px; font-size: 0.9rem; }
-        }
-
-        @media (min-width: 361px) and (max-width: 480px) {
-            .sidebar { width: 280px; }
-            .main-content { margin-left: 0; }
-            .content { padding: 16px; }
-            .stats-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
-            .stat-card { padding: 16px; }
-            .stat-value { font-size: 1.5rem; }
-            .page-title { font-size: 1.2rem; }
-            .topbar { padding: 12px 16px; }
-            .form-grid { grid-template-columns: 1fr; gap: 14px; }
-            .yevmiye-grid { grid-template-columns: 1fr; gap: 14px; }
-            th, td { padding: 12px 14px; font-size: 0.82rem; }
-            .terminal-body { padding: 14px; }
-            .is-turu-grid { grid-template-columns: 1fr 1fr; }
-            .modal { width: 94%; }
-        }
-
-        @media (min-width: 481px) and (max-width: 768px) {
-            .sidebar { width: 300px; }
-            .main-content { margin-left: 0; }
-            .content { padding: 20px; }
-            .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
-            .form-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
-            .yevmiye-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
-            .is-turu-grid { grid-template-columns: repeat(2, 1fr); }
-            .modal { width: 92%; max-width: 600px; }
-        }
-
-        @media (min-width: 769px) and (max-width: 1024px) {
-            .sidebar { width: 260px; }
-            .main-content { margin-left: 260px; }
-            .content { padding: 24px; }
-            .stats-grid { grid-template-columns: repeat(3, 1fr); gap: 16px; }
-            .form-grid { grid-template-columns: repeat(2, 1fr); gap: 18px; }
-            .yevmiye-grid { grid-template-columns: repeat(2, 1fr); gap: 18px; }
-            .is-turu-grid { grid-template-columns: repeat(3, 1fr); }
-            .modal { max-width: 700px; }
-        }
-
-        @media (min-width: 1025px) and (max-width: 1280px) {
-            .sidebar { width: 270px; }
-            .main-content { margin-left: 270px; }
-            .stats-grid { grid-template-columns: repeat(3, 1fr); gap: 18px; }
-            .form-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
-            .yevmiye-grid { grid-template-columns: repeat(3, 1fr); gap: 20px; }
-        }
-
-        @media (max-height: 500px) and (orientation: landscape) {
-            .sidebar { width: 240px; }
-            .sidebar-header { padding: 16px; }
-            .sidebar-header h1 { font-size: 1.1rem; }
-            .nav-item { padding: 8px 12px; font-size: 0.85rem; }
-            .content { padding: 12px; }
-            .stats-grid { grid-template-columns: repeat(3, 1fr); }
-            .stat-card { padding: 12px; }
-            .terminal-body { padding: 12px; }
-            .modal { max-height: 85vh; }
         }
 
         @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
@@ -1363,7 +1444,6 @@
         </div>
     </div>
 
-
     <script>
         // ===================== SABİTLER =====================
         const IS_TURLERI = ['Genel İşçilik', 'Gübreleme', 'İlaçlama', 'Sulama', 'Budama', 'Toprak İşleme', 'Ağır İşçilik', 'Toplama'];
@@ -2090,7 +2170,6 @@
             if (el) el.classList.add('active');
         }
 
-
         // ===================== DASHBOARD =====================
         function renderDashboard() {
             const calisanlar = DB.get('calisanlar', []);
@@ -2307,7 +2386,6 @@
             renderAraziler();
             showToast('Arazi silindi.');
         }
-
 
         // ===================== EL TERMİNALİ =====================
         let selectedIsTuru = 'Genel İşçilik';
@@ -2560,7 +2638,6 @@
             girisler.push({ id: uuid(), calisan_id: calisanId, arazi_id: null, giris_tarihi: new Date().toISOString(), durum: 'yasak', tarih: todayStr(), zaman: new Date().toISOString(), yasak: true });
             DB.set('girisler', girisler);
         }
-
 
         
         // ===================== SAHADA İŞÇİ KONTROLÜ =====================
@@ -2988,7 +3065,6 @@
             showToast('Uygulama kaydı silindi.');
         }
 
-
         // ===================== KULLANICI YÖNETİMİ =====================
         function renderKullanicilar() {
             if (!isAdmin()) { showToast('Bu sayfa için admin yetkisi gerekli!', 'error'); showPage('dashboard', null); return; }
@@ -3312,14 +3388,12 @@
             setTimeout(() => { container.classList.remove('rapor-print'); if (printHeader.parentNode) printHeader.parentNode.removeChild(printHeader); }, 500);
         }
 
-
         // ===================== PARAMETRELER =====================
         function loadParametreler() {
             const params = getParametreler();
             document.getElementById('paramKgUcreti').value = params.kgUcreti.toFixed(2);
             document.getElementById('paramAktifYil').value = params.aktifYil;
         }
-
 
         // ===================== ARA ÖDEME FONKSİYONLARI =====================
         function araOdemeBarkodAra() {
