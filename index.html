@@ -11,7 +11,7 @@
     <!-- ===== FIREBASE SDK (Bulut Veritabanı) ===== -->
     <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+    
     <style>
         :root {
             --primary: #1a5d3a; --primary-dark: #0d3d24; --primary-light: #e8f5e9;
@@ -1301,13 +1301,13 @@
         // 🔥 AŞAĞIDAKİ BİLGİLERİ KENDİ FIREBASE PROJENİZİN BİLGİLERİYLE DEĞİŞTİRİN.
         // Firebase Console > Proje Ayarları > Genel > "Uygulamalarınız" > Web uygulaması > SDK kurulumu ve yapılandırması
         const FIREBASE_CONFIG = {
-                 apiKey: "AIzaSyCT5PmkwsAr17WDHRkLKP1JlpZ42z-AhBA",
-                 authDomain: "asistan-13497.firebaseapp.com",
-                 databaseURL: "https://asistan-13497-default-rtdb.europe-west1.firebasedatabase.app",
-                 projectId: "asistan-13497",
-                 storageBucket: "asistan-13497.firebasestorage.app",
-                 messagingSenderId: "886509733082",
-                 appId: "1:886509733082:web:a1ca0836d0f2ec5ac911e3"
+            apiKey: "AIzaSyCT5PmkwsAr17WDHRkLKP1JlpZ42z-AhBA",
+            authDomain: "asistan-13497.firebaseapp.com",
+            databaseURL: "https://asistan-13497-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "asistan-13497",
+            storageBucket: "asistan-13497.firebasestorage.app",
+            messagingSenderId: "886509733082",
+            appId: "1:886509733082:web:a1ca0836d0f2ec5ac911e3"
         };
         // Firestore'da verilerin saklanacağı koleksiyon adı. Aynı Firebase projesini
         // birden fazla işletme/şube için kullanacaksanız her biri için farklı bir
@@ -1316,19 +1316,14 @@
 
         const FIREBASE_ENABLED = !!(FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.apiKey.indexOf('BURAYA_') === -1);
 
-        let firestore = null, firebaseAuth = null, cloudActive = false, cloudReady = false;
+        let firestore = null, cloudActive = false, cloudReady = false;
         if (FIREBASE_ENABLED) {
             try {
                 firebase.initializeApp(FIREBASE_CONFIG);
                 firestore = firebase.firestore();
-                firebaseAuth = firebase.auth();
-                try { firestore.enablePersistence({ synchronizeTabs: true }).catch(()=>{}); } catch(e) {}
-            // Note: enableMultiTabIndexedDbPersistence is deprecated, using settings instead
-            try { 
-                if (firestore.settings) {
-                    firestore.settings({ cacheSizeBytes: firebase.firestore.CACHE_SIZE_UNLIMITED });
-                }
-            } catch(e) {}
+                
+                // Persistence disabled - no auth required mode
+            // Firestore data is read/written directly without offline cache
             // Note: enableMultiTabIndexedDbPersistence is deprecated in newer versions, using cache setting instead
             try { 
                 if (firestore.settings) {
@@ -1409,7 +1404,7 @@
             const payload = isRemove ? null : (DB._cache[key] !== undefined ? DB._cache[key] : null);
             firestore.collection(FIRESTORE_COLLECTION).doc(key).set({
                 json: JSON.stringify(payload),
-                guncelleyen: currentUser ? currentUser.username : null,
+                guncelleyen: currentUser ? currentUser.username : 'Sistem',
                 guncellemeZamani: firebase.firestore.FieldValue.serverTimestamp()
             }).then(() => setCloudStatus('online'))
               .catch(err => { console.error('Bulut yazma hatası (' + key + '):', err); setCloudStatus('offline'); });
@@ -1472,7 +1467,7 @@
             const overlay = document.getElementById('cloudLoadingOverlay');
             const sub = document.getElementById('cloudLoadingSub');
 
-            if (!FIREBASE_ENABLED || !firestore || !firebaseAuth) {
+            if (!FIREBASE_ENABLED || !firestore) {
                 setCloudStatus('notconfigured');
                 if (sub) sub.textContent = 'Firebase yapılandırılmamış. Veriler bu cihazda (yerel) saklanacak.';
                 cloudActive = false; cloudReady = true;
@@ -1483,22 +1478,9 @@
 
             try {
                 setCloudStatus('connecting');
-                if (sub) sub.textContent = 'Firebase\'e bağlanılıyor ve oturum açılıyor...';
-
-                // Anonymous auth dene, başarısız olursa local moda geç
-                try {
-                    await firebaseAuth.signInAnonymously();
-                } catch (authErr) {
-                    console.warn('Firebase anonim oturum açılamadı:', authErr.message);
-                    if (sub) sub.textContent = 'Firebase oturumu açılamadı. Yerel moda geçiliyor...';
-                    cloudActive = false; cloudReady = true;
-                    setCloudStatus('offline');
-                    initData();
-                    setTimeout(() => overlay && overlay.classList.add('hidden'), 500);
-                    return;
-                }
-
                 if (sub) sub.textContent = 'Sebat Gülyağı verileri yükleniyor...';
+
+                // Auth kullanmadan doğrudan Firestore'a bağlan
                 const snapshot = await firestore.collection(FIRESTORE_COLLECTION).get();
                 cloudActive = true;
 
