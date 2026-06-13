@@ -506,8 +506,6 @@
         .kontrol-bilgi-card .kontrol-detay-value {
             font-size: 1.1rem; font-weight: 700; color: var(--terminal-text);
         }
-
-        
         #isTerminaliCameraArea {
             margin: 16px 0;
             border-radius: 12px;
@@ -535,10 +533,6 @@
         #isTerminaliReader__header_message a {
             color: var(--primary) !important;
         }
-        .camera-active .scanner-icon {
-            animation: pulse 2s infinite;
-            background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
-        }
 
         @media print {
             @page { size: auto; margin: 0; }
@@ -556,7 +550,8 @@
             .rapor-print .badge { border: 1px solid currentColor; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         }
     </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+<base target="_blank">
 </head>
 <body>
 
@@ -564,7 +559,7 @@
     <div class="cloud-loading-overlay" id="cloudLoadingOverlay">
         <div class="cloud-loading-spinner"><i class="fas fa-cloud"></i></div>
         <div class="cloud-loading-title" id="cloudLoadingTitle">Bulut bağlantısı kuruluyor...</div>
-        <div class="cloud-loading-sub" id="cloudLoadingSub">Sebat Gülyağı verileri  üzerinden yükleniyor, lütfen bekleyin.</div>
+        <div class="cloud-loading-sub" id="cloudLoadingSub">Sebat Gülyağı verileri Firebase üzerinden yükleniyor, lütfen bekleyin.</div>
     </div>
 
     <!-- GİRİŞ EKRANI -->
@@ -1306,13 +1301,13 @@
         // 🔥 AŞAĞIDAKİ BİLGİLERİ KENDİ FIREBASE PROJENİZİN BİLGİLERİYLE DEĞİŞTİRİN.
         // Firebase Console > Proje Ayarları > Genel > "Uygulamalarınız" > Web uygulaması > SDK kurulumu ve yapılandırması
         const FIREBASE_CONFIG = {
-            apiKey: "AIzaSyCT5PmkwsAr17WDHRkLKP1JlpZ42z-AhBA",
-            authDomain: "asistan-13497.firebaseapp.com",
-            databaseURL: "https://asistan-13497-default-rtdb.europe-west1.firebasedatabase.app",
-            projectId: "asistan-13497",
-            storageBucket: "asistan-13497.firebasestorage.app",
-            messagingSenderId: "886509733082",
-            appId: "1:886509733082:web:a1ca0836d0f2ec5ac911e3"
+                 apiKey: "AIzaSyCT5PmkwsAr17WDHRkLKP1JlpZ42z-AhBA",
+                 authDomain: "asistan-13497.firebaseapp.com",
+                 databaseURL: "https://asistan-13497-default-rtdb.europe-west1.firebasedatabase.app",
+                 projectId: "asistan-13497",
+                 storageBucket: "asistan-13497.firebasestorage.app",
+                 messagingSenderId: "886509733082",
+                 appId: "1:886509733082:web:a1ca0836d0f2ec5ac911e3"
         };
         // Firestore'da verilerin saklanacağı koleksiyon adı. Aynı Firebase projesini
         // birden fazla işletme/şube için kullanacaksanız her biri için farklı bir
@@ -2569,7 +2564,6 @@
             const icon = document.getElementById('sahadaKontrolScannerIcon');
 
             if (!sahadaKontrolKameraAcik) {
-                // Kamerayı aç
                 cameraArea.style.display = 'block';
                 btn.innerHTML = '<i class="fas fa-stop"></i> KAMERA KAPAT';
                 icon.innerHTML = '<i class="fas fa-camera"></i>';
@@ -2578,26 +2572,21 @@
                 document.getElementById('sahadaKontrolStatusBadge').style.background = '#2563eb';
                 sahadaKontrolKameraAcik = true;
 
-                // Html5Qrcode başlat
                 sahadaKontrolScanner = new Html5Qrcode("sahadaKontrolReader");
                 const config = { fps: 10, qrbox: { width: 250, height: 250 } };
 
                 Html5Qrcode.getCameras().then(cameras => {
                     if (cameras && cameras.length) {
-                        const cameraId = cameras[cameras.length - 1].id; // Arka kamera tercih et
+                        const cameraId = cameras[cameras.length - 1].id;
                         sahadaKontrolScanner.start(
                             cameraId, 
                             config, 
                             (decodedText) => {
-                                // Barkod okundu
                                 document.getElementById('sahadaKontrolBarkodInput').value = decodedText;
                                 sahadaKontrolBarkodOkut();
-                                // Kamerayı kapat
                                 sahadaKontrolKameraKapat();
                             },
-                            (errorMessage) => {
-                                // Hata - sessizce geç
-                            }
+                            (errorMessage) => {}
                         ).catch(err => {
                             showToast('Kamera başlatılamadı: ' + err, 'error');
                             sahadaKontrolKameraKapat();
@@ -2628,7 +2617,6 @@
             cameraArea.style.display = 'none';
             btn.innerHTML = '<i class="fas fa-camera"></i> KAMERA AÇ';
             icon.classList.remove('camera-active');
-            icon.innerHTML = '<i class="fas fa-camera"></i>';
             document.getElementById('sahadaKontrolStatusBadge').textContent = 'Hazır';
             document.getElementById('sahadaKontrolStatusBadge').style.background = 'var(--primary)';
             sahadaKontrolKameraAcik = false;
@@ -2649,10 +2637,11 @@
             if (!calisan) {
                 card.className = 'kontrol-bilgi-card yasak';
                 card.innerHTML = 
-                    '<div class="result-header"><div class="result-icon error"><i class="fas fa-times-circle"></i></div><div class="result-title error">Barkod Bulunamadı</div></div>' +
-                    '<div class="result-body" style="text-align:center;">' +
-                    '<p>Girilen barkod numarası sistemde kayıtlı değil:</p>' +
-                    '<code style="font-size:1.2rem;letter-spacing:2px;">' + barkod + '</code>' +
+                    '<div style="text-align:center;padding:20px;">' +
+                    '<div style="font-size:3rem;color:var(--terminal-danger);margin-bottom:12px;"><i class="fas fa-times-circle"></i></div>' +
+                    '<div style="font-size:1.2rem;font-weight:700;color:var(--terminal-text);margin-bottom:8px;">Barkod Bulunamadı</div>' +
+                    '<p style="color:var(--terminal-muted);">Girilen barkod sistemde kayıtlı değil</p>' +
+                    '<code style="font-size:1.2rem;letter-spacing:2px;color:var(--terminal-text);background:var(--terminal-bg);padding:8px 16px;border-radius:8px;display:inline-block;margin-top:8px;">' + barkod + '</code>' +
                     '</div>';
                 card.style.display = 'block';
                 showToast('Barkod bulunamadı!', 'error');
@@ -2666,33 +2655,35 @@
             const sahada = bugunGiris.length > 0;
 
             let durumHtml = '';
+            let durumClass = 'basarili';
             if (calisan.kategori === 'yasak') {
-                durumHtml = '<span class="badge badge-red" style="font-size:1rem;padding:6px 16px;">YASAK - 18 Yaş Altı</span>';
+                durumHtml = '<span class="badge badge-red" style="font-size:1rem;padding:6px 16px;"><i class="fas fa-ban"></i> YASAK - 18 Yaş Altı</span>';
+                durumClass = 'yasak';
             } else if (sahada) {
                 durumHtml = '<span class="badge badge-green" style="font-size:1rem;padding:6px 16px;"><i class="fas fa-check-circle"></i> SAHADA</span>';
             } else {
                 durumHtml = '<span class="badge badge-gray" style="font-size:1rem;padding:6px 16px;"><i class="fas fa-sign-out-alt"></i> SAHADA DEĞİL</span>';
             }
 
-            card.className = 'kontrol-bilgi-card ' + (calisan.kategori === 'yasak' ? 'yasak' : 'basarili');
+            card.className = 'kontrol-bilgi-card ' + durumClass;
             card.innerHTML = 
                 '<div class="kontrol-avatar"><i class="fas fa-user"></i></div>' +
                 '<div class="kontrol-isim">' + calisan.ad + ' ' + calisan.soyad + '</div>' +
                 '<div style="text-align:center;margin-bottom:16px;">' + durumHtml + '</div>' +
                 '<div class="kontrol-detay">' +
-                '<div class="kontrol-detay-item"><div class="kontrol-detay-label">Yaş</div><div class="kontrol-detay-value">' + calisan.yas + '</div></div>' +
-                '<div class="kontrol-detay-item"><div class="kontrol-detay-label">Kategori</div><div class="kontrol-detay-value" style="color:' + kat.renk + '">' + kat.label + '</div></div>' +
-                '<div class="kontrol-detay-item"><div class="kontrol-detay-label">Barkod</div><div class="kontrol-detay-value" style="font-family:monospace;letter-spacing:2px;font-size:0.9rem;">' + calisan.barkod + '</div></div>' +
-                '<div class="kontrol-detay-item"><div class="kontrol-detay-label">TC Kimlik</div><div class="kontrol-detay-value" style="font-family:monospace;letter-spacing:1px;font-size:0.85rem;">' + calisan.tc_kimlik + '</div></div>' +
+                '<div class="kontrol-detay-item"><div class="kontrol-detay-label"><i class="fas fa-birthday-cake"></i> Yaş</div><div class="kontrol-detay-value">' + calisan.yas + '</div></div>' +
+                '<div class="kontrol-detay-item"><div class="kontrol-detay-label"><i class="fas fa-tag"></i> Kategori</div><div class="kontrol-detay-value" style="color:' + kat.renk + '">' + kat.label + '</div></div>' +
+                '<div class="kontrol-detay-item"><div class="kontrol-detay-label"><i class="fas fa-barcode"></i> Barkod</div><div class="kontrol-detay-value" style="font-family:monospace;letter-spacing:2px;font-size:0.9rem;">' + calisan.barkod + '</div></div>' +
+                '<div class="kontrol-detay-item"><div class="kontrol-detay-label"><i class="fas fa-id-card"></i> TC Kimlik</div><div class="kontrol-detay-value" style="font-family:monospace;letter-spacing:1px;font-size:0.85rem;">' + calisan.tc_kimlik + '</div></div>' +
                 '</div>' +
-                (calisan.telefon ? '<div style="text-align:center;margin-top:12px;padding-top:12px;border-top:1px solid var(--terminal-border);"><span style="color:var(--terminal-muted);font-size:0.8rem;"><i class="fas fa-phone"></i> ' + calisan.telefon + '</span></div>' : '');
+                (calisan.telefon ? '<div style="text-align:center;margin-top:12px;padding-top:12px;border-top:1px solid var(--terminal-border);"><span style="color:var(--terminal-muted);font-size:0.85rem;"><i class="fas fa-phone"></i> ' + calisan.telefon + '</span></div>' : '');
 
             card.style.display = 'block';
 
             if (calisan.kategori === 'yasak') {
                 showToast('UYARI: 18 yaş altı işçi!', 'error');
             } else {
-                showToast('İşçi bilgileri görüntülendi: ' + calisan.ad + ' ' + calisan.soyad, 'success');
+                showToast('İşçi bilgileri: ' + calisan.ad + ' ' + calisan.soyad, 'success');
             }
         }
 
@@ -3364,8 +3355,7 @@
             const printWindow = window.open('', '_blank');
             let h = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Günlük Toplama Raporu</title>';
             h += '<style>@page { size: A4 portrait; margin: 15mm; } body { font-family: Arial, sans-serif; font-size: 10pt; } h2 { text-align: center; margin-bottom: 5px; } .sub { text-align: center; color: #666; font-size: 9pt; margin-bottom: 15px; } .ozet { display: flex; justify-content: space-around; margin-bottom: 20px; padding: 10px; background: #f0f9f0; border: 1px solid #1a5d3a; border-radius: 8px; } .ozet-item { text-align: center; } .ozet-item .val { font-size: 1.4rem; font-weight: bold; color: #1a5d3a; } .ozet-item .lbl { font-size: 0.8rem; color: #666; } table { width: 100%; border-collapse: collapse; margin-top: 10px; } th, td { border: 1px solid #333; padding: 6px 8px; text-align: left; font-size: 9.5pt; } th { background: #1a5d3a; color: white; font-weight: bold; } tr:nth-child(even) { background: #f5f5f5; } .no { text-align: center; width: 40px; } .tutar { text-align: right; font-weight: bold; color: #1a5d3a; }</style>';
-            h += '<script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script></script>
-</head><body>';
+            h += '</head><body>';
             h += '<h2>SEBAT GÜLYAĞI - GÜNLÜK TOPLAMA RAPORU</h2>';
             h += '<div class="sub">Tarih: ' + (filterTarih ? new Date(filterTarih).toLocaleDateString('tr-TR') : 'Tüm Tarihler') + '</div>';
             h += '<div class="ozet"><div class="ozet-item"><div class="val">' + toplamalar.length + '</div><div class="lbl">Kayıt Sayısı</div></div><div class="ozet-item"><div class="val">' + toplamKg.toFixed(2) + ' kg</div><div class="lbl">Toplam KG</div></div><div class="ozet-item"><div class="val">' + toplamTutar.toFixed(2) + ' ₺</div><div class="lbl">Toplam Tutar</div></div></div>';
@@ -3404,8 +3394,7 @@
             const printWindow = window.open('', '_blank');
             let h = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Toplama Özet Raporu</title>';
             h += '<style>@page { size: A4 portrait; margin: 15mm; } body { font-family: Arial, sans-serif; font-size: 10pt; } h2 { text-align: center; margin-bottom: 5px; } .sub { text-align: center; color: #666; font-size: 9pt; margin-bottom: 15px; } .ozet { display: flex; justify-content: space-around; margin-bottom: 20px; padding: 10px; background: #f0f9f0; border: 1px solid #1a5d3a; border-radius: 8px; } .ozet-item { text-align: center; } .ozet-item .val { font-size: 1.4rem; font-weight: bold; color: #1a5d3a; } .ozet-item .lbl { font-size: 0.8rem; color: #666; } table { width: 100%; border-collapse: collapse; margin-top: 10px; } th, td { border: 1px solid #333; padding: 6px 8px; text-align: left; font-size: 9.5pt; } th { background: #1a5d3a; color: white; font-weight: bold; } tr:nth-child(even) { background: #f5f5f5; } .no { text-align: center; width: 40px; } .tutar { text-align: right; font-weight: bold; color: #1a5d3a; }</style>';
-            h += '<script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script></script>
-</head><body>';
+            h += '</head><body>';
             h += '<h2>SEBAT GÜLYAĞI - TOPLAMA ÖZET RAPORU</h2>';
             h += '<div class="sub">' + (filterTarih ? 'Tarih: ' + new Date(filterTarih).toLocaleDateString('tr-TR') : 'Tüm Tarihler') + ' | Toplam İşçi: ' + Object.keys(ozet).length + '</div>';
             h += '<div class="ozet"><div class="ozet-item"><div class="val">' + toplamalar.length + '</div><div class="lbl">Toplam Kayıt</div></div><div class="ozet-item"><div class="val">' + toplamKg.toFixed(2) + ' kg</div><div class="lbl">Toplam KG</div></div><div class="ozet-item"><div class="val">' + toplamTutar.toFixed(2) + ' ₺</div><div class="lbl">Toplam Tutar</div></div></div>';
@@ -3435,8 +3424,7 @@
             const printWindow = window.open('', '_blank');
             let h = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Arazi Uygulama Raporu</title>';
             h += '<style>@page { size: A4 landscape; margin: 15mm; } body { font-family: Arial, sans-serif; font-size: 10pt; } h2 { text-align: center; margin-bottom: 5px; } .sub { text-align: center; color: #666; font-size: 9pt; margin-bottom: 15px; } table { width: 100%; border-collapse: collapse; margin-top: 10px; } th, td { border: 1px solid #333; padding: 6px 8px; text-align: left; font-size: 9.5pt; } th { background: #1a5d3a; color: white; font-weight: bold; } tr:nth-child(even) { background: #f5f5f5; } .no { text-align: center; width: 40px; } .tur { background: #dbeafe; color: #1e40af; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: 600; }</style>';
-            h += '<script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script></script>
-</head><body>';
+            h += '</head><body>';
             h += '<h2>SEBAT GÜLYAĞI - ARAZİ UYGULAMA RAPORU</h2>';
             h += '<div class="sub">' + (baslangic ? 'Başlangıç: ' + new Date(baslangic).toLocaleDateString('tr-TR') : '') + (bitis ? ' | Bitiş: ' + new Date(bitis).toLocaleDateString('tr-TR') : '') + (tur ? ' | Tür: ' + tur : '') + ' | Toplam: ' + uygulamalar.length + ' kayıt</div>';
             h += '<table><thead><tr><th class="no">No</th><th>Tarih</th><th>Arazi</th><th>Uygulama Türü</th><th>Açıklama</th><th>Kaydeden</th></tr></thead><tbody>';
@@ -3457,8 +3445,7 @@
             const printWindow = window.open('', '_blank');
             let html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>İşçi Listesi</title>';
             html += '<style>@page { size: A4 portrait; margin: 15mm; } body { font-family: Arial, sans-serif; font-size: 10pt; } h2 { text-align: center; margin-bottom: 5px; } .sub { text-align: center; color: #666; font-size: 9pt; margin-bottom: 15px; } table { width: 100%; border-collapse: collapse; } th, td { border: 1px solid #333; padding: 6px 8px; text-align: left; font-size: 9.5pt; } th { background: #1a5d3a; color: white; font-weight: bold; } tr:nth-child(even) { background: #f5f5f5; } .no { text-align: center; width: 40px; } .tc { font-family: monospace; letter-spacing: 1px; }</style>';
-            html += '<script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script></script>
-</head><body>';
+            html += '</head><body>';
             html += '<h2>SEBAT GÜLYAĞI - TARIM İŞLETMESİ</h2>';
             html += '<div class="sub">İşçi Listesi | Tarih: ' + new Date().toLocaleDateString('tr-TR') + ' | Toplam: ' + calisanlar.length + ' kişi</div>';
             html += '<table><thead><tr><th class="no">No</th><th>Ad Soyad</th><th class="tc">TC Kimlik No</th><th>Yaş</th></tr></thead><tbody>';
@@ -3530,7 +3517,7 @@
             html += '<div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">';
             html += '<div class="card-title"><i class="fas fa-calendar-day"></i> Günlük Giriş/Çıkış Raporu</div>';
             html += '<div style="display:flex;gap:12px;align-items:center;">';
-            html += '<input type="date" class="form-input no-print" id="raporGunlukTarih" value="' + todayStr() + '">';
+            html += '<input type="date" class="form-input no-print" id="raporGunlukTarih">';
             html += '<button class="btn btn-primary btn-sm no-print" id="btnRaporGunluk"><i class="fas fa-search"></i> Raporla</button>';
             html += '<button class="btn btn-sm btn-secondary no-print" onclick="window.print()"><i class="fas fa-print"></i> Yazdır</button>';
             html += '</div></div>';
