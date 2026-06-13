@@ -718,7 +718,7 @@
         }
     </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
-<link rel="manifest" href="data:application/json;base64,eyJzaG9ydF9uYW1lIjoiU2ViYXQgVjEyIiwibmFtZSI6IlNlYmF0IEfDvGx5YcSfxLEgLSBUYXLEsW0gxLBzxOnDp2kgVGFracSxIFNpc3RlbWkgVjEyIiwic3RhcnRfdXJsIjoiLiIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwidGhlbWVfY29sb3IiOiIjMWE1ZDNhIiwiYmFja2dyb3VuZF9jb2xvciI6IiNmOGZhZmMiLCJpY29ucyI6W3sic3JjIjoiaHR0cHM6Ly9jZG5qcy5jbG91ZGZsYXJlLmNvbS9hamF4L2xpYnMvZm9udC1hd2Vzb21lLzYuNC4wL3N2Z3Mvc29saWQvc3ZnL2xlYWYuc3ZnIiwic2l6ZXMiOiIxOTJ4MTkyIiwidHlwZSI6ImltYWdlL3N2Zyt4bWwifV19">
+<meta name="theme-color" content="#1a5d3a">
     <meta name="theme-color" content="#1a5d3a">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -3534,12 +3534,6 @@
             const printWindow = window.open('', '_blank');
             let h = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Günlük Toplama Raporu</title>';
             h += '<style>@page { size: A4 portrait; margin: 15mm; } body { font-family: Arial, sans-serif; font-size: 10pt; } h2 { text-align: center; margin-bottom: 5px; } .sub { text-align: center; color: #666; font-size: 9pt; margin-bottom: 15px; } .ozet { display: flex; justify-content: space-around; margin-bottom: 20px; padding: 10px; background: #f0f9f0; border: 1px solid #1a5d3a; border-radius: 8px; } .ozet-item { text-align: center; } .ozet-item .val { font-size: 1.4rem; font-weight: bold; color: #1a5d3a; } .ozet-item .lbl { font-size: 0.8rem; color: #666; } table { width: 100%; border-collapse: collapse; margin-top: 10px; } th, td { border: 1px solid #333; padding: 6px 8px; text-align: left; font-size: 9.5pt; } th { background: #1a5d3a; color: white; font-weight: bold; } tr:nth-child(even) { background: #f5f5f5; } .no { text-align: center; width: 40px; } .tutar { text-align: right; font-weight: bold; color: #1a5d3a; }</style>';
-            h += '<link rel="manifest" href="data:application/json;base64,eyJzaG9ydF9uYW1lIjoiU2ViYXQgVjEyIiwibmFtZSI6IlNlYmF0IEfDvGx5YcSfxLEgLSBUYXLEsW0gxLBzxOnDp2kgVGFracSxIFNpc3RlbWkgVjEyIiwic3RhcnRfdXJsIjoiLiIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwidGhlbWVfY29sb3IiOiIjMWE1ZDNhIiwiYmFja2dyb3VuZF9jb2xvciI6IiNmOGZhZmMiLCJpY29ucyI6W3sic3JjIjoiaHR0cHM6Ly9jZG5qcy5jbG91ZGZsYXJlLmNvbS9hamF4L2xpYnMvZm9udC1hd2Vzb21lLzYuNC4wL3N2Z3Mvc29saWQvc3ZnL2xlYWYuc3ZnIiwic2l6ZXMiOiIxOTJ4MTkyIiwidHlwZSI6ImltYWdlL3N2Zyt4bWwifV19">
-    <meta name="theme-color" content="#1a5d3a">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Sebat V12">
-    <meta name="mobile-web-app-capable" content="yes">
 </head><body>';
             h += '<h2>SEBAT GÜLYAĞI - GÜNLÜK TOPLAMA RAPORU</h2>';
             h += '<div class="sub">Tarih: ' + (filterTarih ? new Date(filterTarih).toLocaleDateString('tr-TR') : 'Tüm Tarihler') + '</div>';
@@ -3552,252 +3546,9 @@
             h += '</tbody></table>';
             h += '<div style="margin-top:20px;font-size:8pt;color:#666;text-align:center;">Sebat Gülyağı Tarım İşletme Takip Sistemi v12 | Günlük Rapor</div>';
             h += '
-    <!-- Service Worker for Offline Support -->
-    <script>
-        if ('serviceWorker' in navigator) {
-            const swCode = `
-                const CACHE_NAME = 'sebat-v12-cache-v1';
-                const urlsToCache = [
-                    './',
-                    'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
-                    'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap',
-                    'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js',
-                    'https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.11.5/JsBarcode.all.min.js',
-                    'https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js',
-                    'https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js',
-                    'https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js'
-                ];
+        
+    <!-- Service Worker disabled - not supported in this hosting environment -->
 
-                self.addEventListener('install', event => {
-                    event.waitUntil(
-                        caches.open(CACHE_NAME)
-                            .then(cache => cache.addAll(urlsToCache))
-                    );
-                });
-
-                self.addEventListener('fetch', event => {
-                    event.respondWith(
-                        caches.match(event.request)
-                            .then(response => {
-                                if (response) return response;
-                                return fetch(event.request).catch(() => {
-                                    if (event.request.destination === 'document') {
-                                        return new Response('<html><body style="display:flex;align-items:center;justify-content:center;height:100vh;margin:0;font-family:Inter,sans-serif;background:#1a5d3a;color:white;text-align:center;"><div><i class="fas fa-wifi" style="font-size:3rem;margin-bottom:1rem;"></i><h2>Çevrimdışı Mod</h2><p>İnternet bağlantınız yok. Veriler yerel olarak saklanmaya devam ediyor.</p></div></body></html>', { headers: { 'Content-Type': 'text/html' } });
-                                    }
-                                });
-                            })
-                    );
-                });
-
-                self.addEventListener('activate', event => {
-                    event.waitUntil(
-                        caches.keys().then(cacheNames => {
-                            return Promise.all(
-                                cacheNames.filter(name => name !== CACHE_NAME)
-                                    .map(name => caches.delete(name))
-                            );
-                        })
-                    );
-                });
-            `;
-
-            const blob = new Blob([swCode], { type: 'application/javascript' });
-            const swUrl = URL.createObjectURL(blob);
-            navigator.serviceWorker.register(swUrl).catch(err => console.log('SW kaydı başarısız:', err));
-        }
-    </script>
-
-</body></html>';
-            printWindow.document.write(h);
-            printWindow.document.close();
-            setTimeout(() => { printWindow.print(); }, 300);
-        }
-
-        function printToplamaOzet() {
-            const filterTarih = document.getElementById('toplamaFilterTarih').value;
-            const filterIsci = document.getElementById('toplamaFilterIsci').value;
-            const calisanlar = DB.get('calisanlar', []);
-            let toplamalar = DB.get('toplamalar', []);
-            if (filterTarih) toplamalar = toplamalar.filter(t => t.tarih === filterTarih);
-            if (filterIsci) toplamalar = toplamalar.filter(t => t.calisan_id === filterIsci);
-
-            const ozet = {};
-            toplamalar.forEach(t => {
-                if (!ozet[t.calisan_id]) ozet[t.calisan_id] = { kg: 0, tutar: 0, sayi: 0 };
-                ozet[t.calisan_id].kg += t.kg;
-                ozet[t.calisan_id].tutar += t.tutar;
-                ozet[t.calisan_id].sayi += 1;
-            });
-
-            const toplamKg = toplamalar.reduce((s, t) => s + t.kg, 0);
-            const toplamTutar = toplamalar.reduce((s, t) => s + t.tutar, 0);
-
-            const printWindow = window.open('', '_blank');
-            let h = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Toplama Özet Raporu</title>';
-            h += '<style>@page { size: A4 portrait; margin: 15mm; } body { font-family: Arial, sans-serif; font-size: 10pt; } h2 { text-align: center; margin-bottom: 5px; } .sub { text-align: center; color: #666; font-size: 9pt; margin-bottom: 15px; } .ozet { display: flex; justify-content: space-around; margin-bottom: 20px; padding: 10px; background: #f0f9f0; border: 1px solid #1a5d3a; border-radius: 8px; } .ozet-item { text-align: center; } .ozet-item .val { font-size: 1.4rem; font-weight: bold; color: #1a5d3a; } .ozet-item .lbl { font-size: 0.8rem; color: #666; } table { width: 100%; border-collapse: collapse; margin-top: 10px; } th, td { border: 1px solid #333; padding: 6px 8px; text-align: left; font-size: 9.5pt; } th { background: #1a5d3a; color: white; font-weight: bold; } tr:nth-child(even) { background: #f5f5f5; } .no { text-align: center; width: 40px; } .tutar { text-align: right; font-weight: bold; color: #1a5d3a; }</style>';
-            h += '<link rel="manifest" href="data:application/json;base64,eyJzaG9ydF9uYW1lIjoiU2ViYXQgVjEyIiwibmFtZSI6IlNlYmF0IEfDvGx5YcSfxLEgLSBUYXLEsW0gxLBzxOnDp2kgVGFracSxIFNpc3RlbWkgVjEyIiwic3RhcnRfdXJsIjoiLiIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwidGhlbWVfY29sb3IiOiIjMWE1ZDNhIiwiYmFja2dyb3VuZF9jb2xvciI6IiNmOGZhZmMiLCJpY29ucyI6W3sic3JjIjoiaHR0cHM6Ly9jZG5qcy5jbG91ZGZsYXJlLmNvbS9hamF4L2xpYnMvZm9udC1hd2Vzb21lLzYuNC4wL3N2Z3Mvc29saWQvc3ZnL2xlYWYuc3ZnIiwic2l6ZXMiOiIxOTJ4MTkyIiwidHlwZSI6ImltYWdlL3N2Zyt4bWwifV19">
-    <meta name="theme-color" content="#1a5d3a">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Sebat V12">
-    <meta name="mobile-web-app-capable" content="yes">
-</head><body>';
-            h += '<h2>SEBAT GÜLYAĞI - TOPLAMA ÖZET RAPORU</h2>';
-            h += '<div class="sub">' + (filterTarih ? 'Tarih: ' + new Date(filterTarih).toLocaleDateString('tr-TR') : 'Tüm Tarihler') + ' | Toplam İşçi: ' + Object.keys(ozet).length + '</div>';
-            h += '<div class="ozet"><div class="ozet-item"><div class="val">' + toplamalar.length + '</div><div class="lbl">Toplam Kayıt</div></div><div class="ozet-item"><div class="val">' + toplamKg.toFixed(2) + ' kg</div><div class="lbl">Toplam KG</div></div><div class="ozet-item"><div class="val">' + toplamTutar.toFixed(2) + ' ₺</div><div class="lbl">Toplam Tutar</div></div></div>';
-            h += '<table><thead><tr><th class="no">No</th><th>İşçi</th><th>Toplam KG</th><th>Kayıt Sayısı</th><th class="tutar">Toplam Tutar</th></tr></thead><tbody>';
-            Object.entries(ozet).forEach(([cid, data], i) => {
-                const c = calisanlar.find(x => x.id === cid);
-                h += '<tr><td class="no">' + (i+1) + '</td><td><strong>' + (c ? c.ad + ' ' + c.soyad : 'Bilinmiyor') + '</strong></td><td>' + data.kg.toFixed(2) + ' kg</td><td>' + data.sayi + '</td><td class="tutar">' + data.tutar.toFixed(2) + ' ₺</td></tr>';
-            });
-            h += '</tbody></table>';
-            h += '<div style="margin-top:20px;font-size:8pt;color:#666;text-align:center;">Sebat Gülyağı Tarım İşletme Takip Sistemi v12 | Özet Rapor</div>';
-            h += '
-    <!-- Service Worker for Offline Support -->
-    <script>
-        if ('serviceWorker' in navigator) {
-            const swCode = `
-                const CACHE_NAME = 'sebat-v12-cache-v1';
-                const urlsToCache = [
-                    './',
-                    'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
-                    'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap',
-                    'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js',
-                    'https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.11.5/JsBarcode.all.min.js',
-                    'https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js',
-                    'https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js',
-                    'https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js'
-                ];
-
-                self.addEventListener('install', event => {
-                    event.waitUntil(
-                        caches.open(CACHE_NAME)
-                            .then(cache => cache.addAll(urlsToCache))
-                    );
-                });
-
-                self.addEventListener('fetch', event => {
-                    event.respondWith(
-                        caches.match(event.request)
-                            .then(response => {
-                                if (response) return response;
-                                return fetch(event.request).catch(() => {
-                                    if (event.request.destination === 'document') {
-                                        return new Response('<html><body style="display:flex;align-items:center;justify-content:center;height:100vh;margin:0;font-family:Inter,sans-serif;background:#1a5d3a;color:white;text-align:center;"><div><i class="fas fa-wifi" style="font-size:3rem;margin-bottom:1rem;"></i><h2>Çevrimdışı Mod</h2><p>İnternet bağlantınız yok. Veriler yerel olarak saklanmaya devam ediyor.</p></div></body></html>', { headers: { 'Content-Type': 'text/html' } });
-                                    }
-                                });
-                            })
-                    );
-                });
-
-                self.addEventListener('activate', event => {
-                    event.waitUntil(
-                        caches.keys().then(cacheNames => {
-                            return Promise.all(
-                                cacheNames.filter(name => name !== CACHE_NAME)
-                                    .map(name => caches.delete(name))
-                            );
-                        })
-                    );
-                });
-            `;
-
-            const blob = new Blob([swCode], { type: 'application/javascript' });
-            const swUrl = URL.createObjectURL(blob);
-            navigator.serviceWorker.register(swUrl).catch(err => console.log('SW kaydı başarısız:', err));
-        }
-    </script>
-
-</body></html>';
-            printWindow.document.write(h);
-            printWindow.document.close();
-            setTimeout(() => { printWindow.print(); }, 300);
-        }
-
-        function printUygulamalarRaporu() {
-            const baslangic = document.getElementById('uygulamaFilterBaslangic').value;
-            const bitis = document.getElementById('uygulamaFilterBitis').value;
-            const tur = document.getElementById('uygulamaFilterTur').value;
-            let uygulamalar = DB.get('uygulamalar', []);
-            if (baslangic) uygulamalar = uygulamalar.filter(u => u.uygulama_tarihi >= baslangic);
-            if (bitis) uygulamalar = uygulamalar.filter(u => u.uygulama_tarihi <= bitis);
-            if (tur) uygulamalar = uygulamalar.filter(u => u.uygulama_turu === tur);
-            const araziler = DB.get('araziler', []);
-
-            const printWindow = window.open('', '_blank');
-            let h = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Arazi Uygulama Raporu</title>';
-            h += '<style>@page { size: A4 landscape; margin: 15mm; } body { font-family: Arial, sans-serif; font-size: 10pt; } h2 { text-align: center; margin-bottom: 5px; } .sub { text-align: center; color: #666; font-size: 9pt; margin-bottom: 15px; } table { width: 100%; border-collapse: collapse; margin-top: 10px; } th, td { border: 1px solid #333; padding: 6px 8px; text-align: left; font-size: 9.5pt; } th { background: #1a5d3a; color: white; font-weight: bold; } tr:nth-child(even) { background: #f5f5f5; } .no { text-align: center; width: 40px; } .tur { background: #dbeafe; color: #1e40af; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: 600; }</style>';
-            h += '<link rel="manifest" href="data:application/json;base64,eyJzaG9ydF9uYW1lIjoiU2ViYXQgVjEyIiwibmFtZSI6IlNlYmF0IEfDvGx5YcSfxLEgLSBUYXLEsW0gxLBzxOnDp2kgVGFracSxIFNpc3RlbWkgVjEyIiwic3RhcnRfdXJsIjoiLiIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwidGhlbWVfY29sb3IiOiIjMWE1ZDNhIiwiYmFja2dyb3VuZF9jb2xvciI6IiNmOGZhZmMiLCJpY29ucyI6W3sic3JjIjoiaHR0cHM6Ly9jZG5qcy5jbG91ZGZsYXJlLmNvbS9hamF4L2xpYnMvZm9udC1hd2Vzb21lLzYuNC4wL3N2Z3Mvc29saWQvc3ZnL2xlYWYuc3ZnIiwic2l6ZXMiOiIxOTJ4MTkyIiwidHlwZSI6ImltYWdlL3N2Zyt4bWwifV19">
-    <meta name="theme-color" content="#1a5d3a">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Sebat V12">
-    <meta name="mobile-web-app-capable" content="yes">
-</head><body>';
-            h += '<h2>SEBAT GÜLYAĞI - ARAZİ UYGULAMA RAPORU</h2>';
-            h += '<div class="sub">' + (baslangic ? 'Başlangıç: ' + new Date(baslangic).toLocaleDateString('tr-TR') : '') + (bitis ? ' | Bitiş: ' + new Date(bitis).toLocaleDateString('tr-TR') : '') + (tur ? ' | Tür: ' + tur : '') + ' | Toplam: ' + uygulamalar.length + ' kayıt</div>';
-            h += '<table><thead><tr><th class="no">No</th><th>Tarih</th><th>Arazi</th><th>Uygulama Türü</th><th>Açıklama</th><th>Kaydeden</th></tr></thead><tbody>';
-            uygulamalar.forEach((u, i) => {
-                const a = araziler.find(x => x.id === u.arazi_id);
-                h += '<tr><td class="no">' + (i+1) + '</td><td>' + new Date(u.uygulama_tarihi).toLocaleDateString('tr-TR') + '</td><td><strong>' + (a ? a.arazi_adi : '-') + '</strong></td><td><span class="tur">' + u.uygulama_turu + '</span></td><td>' + (u.aciklama || '-') + '</td><td>' + (u.kaydeden || '-') + '</td></tr>';
-            });
-            h += '</tbody></table>';
-            h += '<div style="margin-top:20px;font-size:8pt;color:#666;text-align:center;">Sebat Gülyağı Tarım İşletme Takip Sistemi v12 | Arazi Uygulama Raporu</div>';
-            h += '
-    <!-- Service Worker for Offline Support -->
-    <script>
-        if ('serviceWorker' in navigator) {
-            const swCode = `
-                const CACHE_NAME = 'sebat-v12-cache-v1';
-                const urlsToCache = [
-                    './',
-                    'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
-                    'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap',
-                    'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js',
-                    'https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.11.5/JsBarcode.all.min.js',
-                    'https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js',
-                    'https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js',
-                    'https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js'
-                ];
-
-                self.addEventListener('install', event => {
-                    event.waitUntil(
-                        caches.open(CACHE_NAME)
-                            .then(cache => cache.addAll(urlsToCache))
-                    );
-                });
-
-                self.addEventListener('fetch', event => {
-                    event.respondWith(
-                        caches.match(event.request)
-                            .then(response => {
-                                if (response) return response;
-                                return fetch(event.request).catch(() => {
-                                    if (event.request.destination === 'document') {
-                                        return new Response('<html><body style="display:flex;align-items:center;justify-content:center;height:100vh;margin:0;font-family:Inter,sans-serif;background:#1a5d3a;color:white;text-align:center;"><div><i class="fas fa-wifi" style="font-size:3rem;margin-bottom:1rem;"></i><h2>Çevrimdışı Mod</h2><p>İnternet bağlantınız yok. Veriler yerel olarak saklanmaya devam ediyor.</p></div></body></html>', { headers: { 'Content-Type': 'text/html' } });
-                                    }
-                                });
-                            })
-                    );
-                });
-
-                self.addEventListener('activate', event => {
-                    event.waitUntil(
-                        caches.keys().then(cacheNames => {
-                            return Promise.all(
-                                cacheNames.filter(name => name !== CACHE_NAME)
-                                    .map(name => caches.delete(name))
-                            );
-                        })
-                    );
-                });
-            `;
-
-            const blob = new Blob([swCode], { type: 'application/javascript' });
-            const swUrl = URL.createObjectURL(blob);
-            navigator.serviceWorker.register(swUrl).catch(err => console.log('SW kaydı başarısız:', err));
-        }
-    </script>
 
 </body></html>';
             printWindow.document.write(h);
@@ -3810,12 +3561,6 @@
             const printWindow = window.open('', '_blank');
             let html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>İşçi Listesi</title>';
             html += '<style>@page { size: A4 portrait; margin: 15mm; } body { font-family: Arial, sans-serif; font-size: 10pt; } h2 { text-align: center; margin-bottom: 5px; } .sub { text-align: center; color: #666; font-size: 9pt; margin-bottom: 15px; } table { width: 100%; border-collapse: collapse; } th, td { border: 1px solid #333; padding: 6px 8px; text-align: left; font-size: 9.5pt; } th { background: #1a5d3a; color: white; font-weight: bold; } tr:nth-child(even) { background: #f5f5f5; } .no { text-align: center; width: 40px; } .tc { font-family: monospace; letter-spacing: 1px; }</style>';
-            html += '<link rel="manifest" href="data:application/json;base64,eyJzaG9ydF9uYW1lIjoiU2ViYXQgVjEyIiwibmFtZSI6IlNlYmF0IEfDvGx5YcSfxLEgLSBUYXLEsW0gxLBzxOnDp2kgVGFracSxIFNpc3RlbWkgVjEyIiwic3RhcnRfdXJsIjoiLiIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwidGhlbWVfY29sb3IiOiIjMWE1ZDNhIiwiYmFja2dyb3VuZF9jb2xvciI6IiNmOGZhZmMiLCJpY29ucyI6W3sic3JjIjoiaHR0cHM6Ly9jZG5qcy5jbG91ZGZsYXJlLmNvbS9hamF4L2xpYnMvZm9udC1hd2Vzb21lLzYuNC4wL3N2Z3Mvc29saWQvc3ZnL2xlYWYuc3ZnIiwic2l6ZXMiOiIxOTJ4MTkyIiwidHlwZSI6ImltYWdlL3N2Zyt4bWwifV19">
-    <meta name="theme-color" content="#1a5d3a">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Sebat V12">
-    <meta name="mobile-web-app-capable" content="yes">
 </head><body>';
             html += '<h2>SEBAT GÜLYAĞI - TARIM İŞLETMESİ</h2>';
             html += '<div class="sub">İşçi Listesi | Tarih: ' + new Date().toLocaleDateString('tr-TR') + ' | Toplam: ' + calisanlar.length + ' kişi</div>';
@@ -3828,58 +3573,9 @@
             html += '
     <!-- Service Worker for Offline Support -->
     <script>
-        if ('serviceWorker' in navigator) {
-            const swCode = `
-                const CACHE_NAME = 'sebat-v12-cache-v1';
-                const urlsToCache = [
-                    './',
-                    'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
-                    'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap',
-                    'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js',
-                    'https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.11.5/JsBarcode.all.min.js',
-                    'https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js',
-                    'https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js',
-                    'https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js'
-                ];
+        
+    <!-- SW registration removed -->
 
-                self.addEventListener('install', event => {
-                    event.waitUntil(
-                        caches.open(CACHE_NAME)
-                            .then(cache => cache.addAll(urlsToCache))
-                    );
-                });
-
-                self.addEventListener('fetch', event => {
-                    event.respondWith(
-                        caches.match(event.request)
-                            .then(response => {
-                                if (response) return response;
-                                return fetch(event.request).catch(() => {
-                                    if (event.request.destination === 'document') {
-                                        return new Response('<html><body style="display:flex;align-items:center;justify-content:center;height:100vh;margin:0;font-family:Inter,sans-serif;background:#1a5d3a;color:white;text-align:center;"><div><i class="fas fa-wifi" style="font-size:3rem;margin-bottom:1rem;"></i><h2>Çevrimdışı Mod</h2><p>İnternet bağlantınız yok. Veriler yerel olarak saklanmaya devam ediyor.</p></div></body></html>', { headers: { 'Content-Type': 'text/html' } });
-                                    }
-                                });
-                            })
-                    );
-                });
-
-                self.addEventListener('activate', event => {
-                    event.waitUntil(
-                        caches.keys().then(cacheNames => {
-                            return Promise.all(
-                                cacheNames.filter(name => name !== CACHE_NAME)
-                                    .map(name => caches.delete(name))
-                            );
-                        })
-                    );
-                });
-            `;
-
-            const blob = new Blob([swCode], { type: 'application/javascript' });
-            const swUrl = URL.createObjectURL(blob);
-            navigator.serviceWorker.register(swUrl).catch(err => console.log('SW kaydı başarısız:', err));
-        }
-    </script>
 
 </body></html>';
             printWindow.document.write(html);
