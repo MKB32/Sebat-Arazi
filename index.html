@@ -534,14 +534,7 @@
             .barkod-card, .barkod-etiket { border-width: 1.5px; }
         }
 
-        @media (prefers-color-scheme: dark) {
-            body { background: #0f172a; color: #e2e8f0; }
-            .card, .stat-card, .modal { background: #1e293b; color: #e2e8f0; }
-            .form-input, .form-select { background: #1e293b; color: #e2e8f0; border-color: #334155; }
-            th { background: #1e293b; color: #94a3b8; }
-            tr:hover { background: #334155; }
-            .topbar { background: #1e293b; }
-        }
+        /* Karanlık mod devre dışı - sadece aydınlık mod kullanılıyor */
 
         @supports (padding-top: env(safe-area-inset-top)) {
             .topbar { padding-top: max(16px, env(safe-area-inset-top)); padding-left: max(32px, env(safe-area-inset-left)); padding-right: max(32px, env(safe-area-inset-right)); }
