@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, minimum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Sebat Gülyağı - Tarım İşçi Takip Sistemi v12</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -254,7 +254,7 @@
         .cloud-loading-overlay .cloud-loading-title { font-size: 1.1rem; font-weight: 700; }
         .cloud-loading-overlay .cloud-loading-sub { font-size: 0.85rem; color: rgba(255,255,255,0.7); max-width: 360px; }
 
-        /* İŞ TERMİNALİ */
+        /* EL TERMİNALİ */
         .terminal-page { background: var(--terminal-bg); min-height: 100vh; color: var(--terminal-text); }
         .terminal-header {
             background: var(--terminal-card); padding: 16px 20px;
@@ -433,35 +433,148 @@
         }
 
         
-        /* KAMERA TARAYICI STILLERI */
-        .camera-scanner-container {
-            position: relative;
-            width: 100%;
-            max-width: 500px;
-            margin: 0 auto;
-            border-radius: var(--radius);
+        /* ========== MOBILE & TABLET RESPONSIVE STYLES ========== */
+
+        html { -webkit-text-size-adjust: 100%; }
+
+        .btn, .nav-item, .tab, .is-turu-btn, .terminal-btn, .list-item-btn {
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            min-height: 44px;
+        }
+
+        @media (max-width: 360px) {
+            .sidebar { width: 260px; }
+            .main-content { margin-left: 0; }
+            .content { padding: 12px; }
+            .stats-grid { grid-template-columns: 1fr; gap: 10px; }
+            .stat-card { padding: 14px; }
+            .stat-value { font-size: 1.4rem; }
+            .page-title { font-size: 1.1rem; }
+            .topbar { padding: 10px 14px; }
+            .btn { padding: 8px 14px; font-size: 0.8rem; }
+            .form-grid { grid-template-columns: 1fr; gap: 12px; padding: 16px; }
+            .yevmiye-grid { grid-template-columns: 1fr; gap: 12px; padding: 16px; }
+            th, td { padding: 10px 12px; font-size: 0.8rem; }
+            .card-header { padding: 14px 16px; flex-wrap: wrap; gap: 8px; }
+            .card-title { font-size: 1rem; }
+            .terminal-body { padding: 12px; }
+            .terminal-scanner { padding: 16px; }
+            .scanner-icon { width: 60px; height: 60px; font-size: 1.5rem; }
+            .scanner-text { font-size: 1rem; }
+            .is-turu-grid { grid-template-columns: 1fr; }
+            .modal { width: 95%; margin: 10px; }
+            .modal-body { padding: 16px; }
+            .cloud-status, .current-user-badge { font-size: 0.7rem; padding: 4px 10px; }
+            .terminal-input { padding: 12px; font-size: 0.9rem; }
+            .terminal-btn-scan { padding: 12px; font-size: 0.9rem; }
+        }
+
+        @media (min-width: 361px) and (max-width: 480px) {
+            .sidebar { width: 280px; }
+            .main-content { margin-left: 0; }
+            .content { padding: 16px; }
+            .stats-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+            .stat-card { padding: 16px; }
+            .stat-value { font-size: 1.5rem; }
+            .page-title { font-size: 1.2rem; }
+            .topbar { padding: 12px 16px; }
+            .form-grid { grid-template-columns: 1fr; gap: 14px; }
+            .yevmiye-grid { grid-template-columns: 1fr; gap: 14px; }
+            th, td { padding: 12px 14px; font-size: 0.82rem; }
+            .terminal-body { padding: 14px; }
+            .is-turu-grid { grid-template-columns: 1fr 1fr; }
+            .modal { width: 94%; }
+        }
+
+        @media (min-width: 481px) and (max-width: 768px) {
+            .sidebar { width: 300px; }
+            .main-content { margin-left: 0; }
+            .content { padding: 20px; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+            .form-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+            .yevmiye-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+            .is-turu-grid { grid-template-columns: repeat(2, 1fr); }
+            .modal { width: 92%; max-width: 600px; }
+        }
+
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .sidebar { width: 260px; }
+            .main-content { margin-left: 260px; }
+            .content { padding: 24px; }
+            .stats-grid { grid-template-columns: repeat(3, 1fr); gap: 16px; }
+            .form-grid { grid-template-columns: repeat(2, 1fr); gap: 18px; }
+            .yevmiye-grid { grid-template-columns: repeat(2, 1fr); gap: 18px; }
+            .is-turu-grid { grid-template-columns: repeat(3, 1fr); }
+            .modal { max-width: 700px; }
+        }
+
+        @media (min-width: 1025px) and (max-width: 1280px) {
+            .sidebar { width: 270px; }
+            .main-content { margin-left: 270px; }
+            .stats-grid { grid-template-columns: repeat(3, 1fr); gap: 18px; }
+            .form-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
+            .yevmiye-grid { grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        }
+
+        @media (max-height: 500px) and (orientation: landscape) {
+            .sidebar { width: 240px; }
+            .sidebar-header { padding: 16px; }
+            .sidebar-header h1 { font-size: 1.1rem; }
+            .nav-item { padding: 8px 12px; font-size: 0.85rem; }
+            .content { padding: 12px; }
+            .stats-grid { grid-template-columns: repeat(3, 1fr); }
+            .stat-card { padding: 12px; }
+            .terminal-body { padding: 12px; }
+            .modal { max-height: 85vh; }
+        }
+
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+            .barkod-card, .barkod-etiket { border-width: 1.5px; }
+        }
+
+        @media (prefers-color-scheme: dark) {
+            body { background: #0f172a; color: #e2e8f0; }
+            .card, .stat-card, .modal { background: #1e293b; color: #e2e8f0; }
+            .form-input, .form-select { background: #1e293b; color: #e2e8f0; border-color: #334155; }
+            th { background: #1e293b; color: #94a3b8; }
+            tr:hover { background: #334155; }
+            .topbar { background: #1e293b; }
+        }
+
+        @supports (padding-top: env(safe-area-inset-top)) {
+            .topbar { padding-top: max(16px, env(safe-area-inset-top)); padding-left: max(32px, env(safe-area-inset-left)); padding-right: max(32px, env(safe-area-inset-right)); }
+            .content { padding-bottom: max(32px, env(safe-area-inset-bottom)); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+        }
+
+        @media (hover: none) and (pointer: coarse) {
+            .btn:hover { transform: none; }
+            .nav-item:hover { background: none; }
+            .nav-item:active { background: rgba(255,255,255,0.15); }
+            .is-turu-btn:hover { border-color: var(--terminal-border); color: var(--terminal-text); }
+            .is-turu-btn:active { border-color: var(--primary); color: var(--primary); }
+            .terminal-btn-scan:hover { transform: none; box-shadow: none; }
+            .terminal-btn-scan:active { transform: scale(0.98); }
+        }
+
+        /* Kamera Tarayici Stilleri */
+        #isTerminaliCameraArea, #sahadaKontrolCameraArea {
+            margin: 16px 0;
+            border-radius: 12px;
             overflow: hidden;
-            border: 2px solid var(--primary);
+            border: 2px solid var(--terminal-border);
+            background: var(--terminal-bg);
         }
-        #sahadaKontrolReader video {
+        #isTerminaliReader video, #sahadaKontrolReader video {
             width: 100% !important;
-            border-radius: var(--radius) !important;
+            border-radius: 12px !important;
         }
-        #sahadaKontrolReader {
+        #isTerminaliReader, #sahadaKontrolReader {
             border: none !important;
-        }
-        #sahadaKontrolReader__dashboard_section_csr span {
-            color: var(--terminal-text) !important;
-        }
-        #sahadaKontrolReader__dashboard_section_swaplink {
-            color: var(--primary) !important;
-        }
-        #sahadaKontrolReader__header_message {
-            background: var(--terminal-card) !important;
-            color: var(--terminal-text) !important;
-        }
-        #sahadaKontrolReader__header_message a {
-            color: var(--primary) !important;
         }
         .camera-active .scanner-icon {
             animation: pulse 2s infinite;
@@ -487,220 +600,19 @@
             font-size: 1.25rem; font-weight: 700; color: var(--terminal-text);
             text-align: center; margin-bottom: 4px;
         }
-        .kontrol-bilgi-card .kontrol-kategori {
-            text-align: center; font-size: 0.875rem; font-weight: 600;
-            padding: 4px 12px; border-radius: 20px; display: inline-block;
-            margin: 0 auto 16px;
-        }
         .kontrol-bilgi-card .kontrol-detay {
             display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
             margin-top: 16px; padding-top: 16px;
             border-top: 1px solid var(--terminal-border);
         }
-        .kontrol-bilgi-card .kontrol-detay-item {
-            text-align: center;
-        }
+        .kontrol-bilgi-card .kontrol-detay-item { text-align: center; }
         .kontrol-bilgi-card .kontrol-detay-label {
             font-size: 0.75rem; color: var(--terminal-muted); margin-bottom: 4px;
         }
         .kontrol-bilgi-card .kontrol-detay-value {
             font-size: 1.1rem; font-weight: 700; color: var(--terminal-text);
         }
-        #isTerminaliCameraArea {
-            margin: 16px 0;
-            border-radius: 12px;
-            overflow: hidden;
-            border: 2px solid var(--terminal-border);
-            background: var(--terminal-bg);
-        }
-        #isTerminaliReader video {
-            width: 100% !important;
-            border-radius: 12px !important;
-        }
-        #isTerminaliReader {
-            border: none !important;
-        }
-        #isTerminaliReader__dashboard_section_csr span {
-            color: var(--terminal-text) !important;
-        }
-        #isTerminaliReader__dashboard_section_swaplink {
-            color: var(--primary) !important;
-        }
-        #isTerminaliReader__header_message {
-            background: var(--terminal-card) !important;
-            color: var(--terminal-text) !important;
-        }
-        #isTerminaliReader__header_message a {
-            color: var(--primary) !important;
-        }
 
-        
-        /* ========== MOBILE & TABLET RESPONSIVE STYLES ========== */
-
-        /* Base responsive adjustments */
-        html { -webkit-text-size-adjust: 100%; }
-
-        /* Touch-friendly improvements */
-        .btn, .nav-item, .tab, .is-turu-btn, .terminal-btn, .list-item-btn {
-            -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation;
-            min-height: 44px; /* iOS minimum touch target */
-        }
-
-        /* Small phones (up to 360px) */
-        @media (max-width: 360px) {
-            .sidebar { width: 260px; }
-            .main-content { margin-left: 0; }
-            .content { padding: 12px; }
-            .stats-grid { grid-template-columns: 1fr; gap: 10px; }
-            .stat-card { padding: 14px; }
-            .stat-value { font-size: 1.4rem; }
-            .page-title { font-size: 1.1rem; }
-            .topbar { padding: 10px 14px; }
-            .topbar-actions { gap: 6px; }
-            .btn { padding: 8px 14px; font-size: 0.8rem; }
-            .form-grid { grid-template-columns: 1fr; gap: 12px; padding: 16px; }
-            .yevmiye-grid { grid-template-columns: 1fr; gap: 12px; padding: 16px; }
-            th, td { padding: 10px 12px; font-size: 0.8rem; }
-            .card-header { padding: 14px 16px; flex-wrap: wrap; gap: 8px; }
-            .card-title { font-size: 1rem; }
-            .terminal-body { padding: 12px; }
-            .terminal-scanner { padding: 16px; }
-            .scanner-icon { width: 60px; height: 60px; font-size: 1.5rem; }
-            .scanner-text { font-size: 1rem; }
-            .is-turu-grid { grid-template-columns: 1fr; }
-            .modal { width: 95%; margin: 10px; }
-            .modal-body { padding: 16px; }
-            .cloud-status, .current-user-badge { font-size: 0.7rem; padding: 4px 10px; }
-            .terminal-input { padding: 12px; font-size: 0.9rem; }
-            .terminal-btn-scan { padding: 12px; font-size: 0.9rem; }
-            .kontrol-detay { grid-template-columns: 1fr !important; }
-        }
-
-        /* Phones (361px - 480px) */
-        @media (min-width: 361px) and (max-width: 480px) {
-            .sidebar { width: 280px; }
-            .main-content { margin-left: 0; }
-            .content { padding: 16px; }
-            .stats-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
-            .stat-card { padding: 16px; }
-            .stat-value { font-size: 1.5rem; }
-            .page-title { font-size: 1.2rem; }
-            .topbar { padding: 12px 16px; }
-            .form-grid { grid-template-columns: 1fr; gap: 14px; }
-            .yevmiye-grid { grid-template-columns: 1fr; gap: 14px; }
-            th, td { padding: 12px 14px; font-size: 0.82rem; }
-            .terminal-body { padding: 14px; }
-            .is-turu-grid { grid-template-columns: 1fr 1fr; }
-            .modal { width: 94%; }
-        }
-
-        /* Large phones / Small tablets (481px - 768px) */
-        @media (min-width: 481px) and (max-width: 768px) {
-            .sidebar { width: 300px; }
-            .main-content { margin-left: 0; }
-            .content { padding: 20px; }
-            .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
-            .form-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
-            .yevmiye-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
-            .is-turu-grid { grid-template-columns: repeat(2, 1fr); }
-            .modal { width: 92%; max-width: 600px; }
-        }
-
-        /* Tablets (769px - 1024px) */
-        @media (min-width: 769px) and (max-width: 1024px) {
-            .sidebar { width: 260px; }
-            .main-content { margin-left: 260px; }
-            .content { padding: 24px; }
-            .stats-grid { grid-template-columns: repeat(3, 1fr); gap: 16px; }
-            .form-grid { grid-template-columns: repeat(2, 1fr); gap: 18px; }
-            .yevmiye-grid { grid-template-columns: repeat(2, 1fr); gap: 18px; }
-            .is-turu-grid { grid-template-columns: repeat(3, 1fr); }
-            .modal { max-width: 700px; }
-        }
-
-        /* Large tablets / Small desktops (1025px - 1280px) */
-        @media (min-width: 1025px) and (max-width: 1280px) {
-            .sidebar { width: 270px; }
-            .main-content { margin-left: 270px; }
-            .stats-grid { grid-template-columns: repeat(3, 1fr); gap: 18px; }
-            .form-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
-            .yevmiye-grid { grid-template-columns: repeat(3, 1fr); gap: 20px; }
-        }
-
-        /* Landscape orientation specific */
-        @media (max-height: 500px) and (orientation: landscape) {
-            .sidebar { width: 240px; }
-            .sidebar-header { padding: 16px; }
-            .sidebar-header h1 { font-size: 1.1rem; }
-            .nav-item { padding: 8px 12px; font-size: 0.85rem; }
-            .content { padding: 12px; }
-            .stats-grid { grid-template-columns: repeat(3, 1fr); }
-            .stat-card { padding: 12px; }
-            .terminal-body { padding: 12px; }
-            .modal { max-height: 85vh; }
-        }
-
-        /* High DPI / Retina displays */
-        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
-            .barkod-card, .barkod-etiket {
-                border-width: 1.5px;
-            }
-        }
-
-        /* Dark mode support for mobile */
-        @media (prefers-color-scheme: dark) {
-            body {
-                background: #0f172a;
-                color: #e2e8f0;
-            }
-            .card, .stat-card, .modal {
-                background: #1e293b;
-                color: #e2e8f0;
-            }
-            .form-input, .form-select {
-                background: #1e293b;
-                color: #e2e8f0;
-                border-color: #334155;
-            }
-            th { background: #1e293b; color: #94a3b8; }
-            tr:hover { background: #334155; }
-            .topbar { background: #1e293b; }
-        }
-
-        /* Safe area for notched phones */
-        @supports (padding-top: env(safe-area-inset-top)) {
-            .topbar {
-                padding-top: max(16px, env(safe-area-inset-top));
-                padding-left: max(32px, env(safe-area-inset-left));
-                padding-right: max(32px, env(safe-area-inset-right));
-            }
-            .content {
-                padding-bottom: max(32px, env(safe-area-inset-bottom));
-            }
-        }
-
-        /* Reduced motion preference */
-        @media (prefers-reduced-motion: reduce) {
-            *, *::before, *::after {
-                animation-duration: 0.01ms !important;
-                animation-iteration-count: 1 !important;
-                transition-duration: 0.01ms !important;
-            }
-        }
-
-        /* Touch device optimizations */
-        @media (hover: none) and (pointer: coarse) {
-            .btn:hover { transform: none; }
-            .nav-item:hover { background: none; }
-            .nav-item:active { background: rgba(255,255,255,0.15); }
-            .is-turu-btn:hover { border-color: var(--terminal-border); color: var(--terminal-text); }
-            .is-turu-btn:active { border-color: var(--primary); color: var(--primary); }
-            .terminal-btn-scan:hover { transform: none; box-shadow: none; }
-            .terminal-btn-scan:active { transform: scale(0.98); }
-        }
-
-        /* Print styles remain at the bottom */
         @media print {
             @page { size: auto; margin: 0; }
             body * { visibility: hidden; }
@@ -717,13 +629,8 @@
             .rapor-print .badge { border: 1px solid currentColor; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         }
     </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
-<meta name="theme-color" content="#1a5d3a">
-    <meta name="theme-color" content="#1a5d3a">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Sebat V12">
-    <meta name="mobile-web-app-capable" content="yes">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 <base target="_blank">
 </head>
 <body>
@@ -1495,14 +1402,7 @@
                 firebase.initializeApp(FIREBASE_CONFIG);
                 firestore = firebase.firestore();
                 
-                // Persistence disabled - no auth required mode
-            // Firestore data is read/written directly without offline cache
-            // Note: enableMultiTabIndexedDbPersistence is deprecated in newer versions, using cache setting instead
-            try { 
-                if (firestore.settings) {
-                    firestore.settings({ cacheSizeBytes: firebase.firestore.CACHE_SIZE_UNLIMITED });
-                }
-            } catch(e) {}
+                try { firestore.enablePersistence({ synchronizeTabs: true }).catch(()=>{}); } catch(e) {}
             } catch (e) {
                 console.error('Firebase başlatılamadı:', e);
             }
@@ -1577,7 +1477,7 @@
             const payload = isRemove ? null : (DB._cache[key] !== undefined ? DB._cache[key] : null);
             firestore.collection(FIRESTORE_COLLECTION).doc(key).set({
                 json: JSON.stringify(payload),
-                guncelleyen: currentUser ? currentUser.username : 'Sistem',
+                guncelleyen: currentUser ? currentUser.username : null,
                 guncellemeZamani: firebase.firestore.FieldValue.serverTimestamp()
             }).then(() => setCloudStatus('online'))
               .catch(err => { console.error('Bulut yazma hatası (' + key + '):', err); setCloudStatus('offline'); });
@@ -1640,7 +1540,7 @@
             const overlay = document.getElementById('cloudLoadingOverlay');
             const sub = document.getElementById('cloudLoadingSub');
 
-            if (!FIREBASE_ENABLED || !firestore) {
+            if (!FIREBASE_ENABLED || !firestore || !firebaseAuth) {
                 setCloudStatus('notconfigured');
                 if (sub) sub.textContent = 'Firebase yapılandırılmamış. Veriler bu cihazda (yerel) saklanacak.';
                 cloudActive = false; cloudReady = true;
@@ -1652,8 +1552,6 @@
             try {
                 setCloudStatus('connecting');
                 if (sub) sub.textContent = 'Sebat Gülyağı verileri yükleniyor...';
-
-                // Auth kullanmadan doğrudan Firestore'a bağlan
                 const snapshot = await firestore.collection(FIRESTORE_COLLECTION).get();
                 cloudActive = true;
 
@@ -2021,7 +1919,6 @@
             document.getElementById('btnSaveArazi').addEventListener('click', submitAraziForm);
 
             // Terminal
-            document.getElementById('btnIsTerminaliKamera').addEventListener('click', isTerminaliKameraToggle);
             document.getElementById('btnTerminalOkut').addEventListener('click', terminalBarkodOkut);
             document.getElementById('terminalBarkodInput').addEventListener('keydown', function(e) {
                 if(e.key === 'Enter') terminalBarkodOkut();
@@ -2126,6 +2023,9 @@
             document.getElementById('sahadaKontrolBarkodInput').addEventListener('keydown', function(e) {
                 if(e.key === 'Enter') sahadaKontrolBarkodOkut();
             });
+
+            // İş Terminali Kamera
+            document.getElementById('btnIsTerminaliKamera').addEventListener('click', isTerminaliKameraToggle);
 
             // Arazi uygulamaları filtre
             document.getElementById('uygulamaFilterBaslangic').addEventListener('change', renderUygulamalar);
@@ -2438,72 +2338,6 @@
             document.getElementById('terminalHesaplananTutar').textContent = (kg * birim).toFixed(2);
         }
 
-        
-        let isTerminaliScanner = null;
-        let isTerminaliKameraAcik = false;
-
-        function isTerminaliKameraToggle() {
-            const cameraArea = document.getElementById('isTerminaliCameraArea');
-            const btn = document.getElementById('btnIsTerminaliKamera');
-            const icon = document.getElementById('scannerIcon');
-
-            if (!isTerminaliKameraAcik) {
-                cameraArea.style.display = 'block';
-                btn.innerHTML = '<i class="fas fa-stop"></i> KAMERA KAPAT';
-                icon.classList.add('camera-active');
-                document.getElementById('terminalStatusBadge').textContent = 'Kamera Açık';
-                document.getElementById('terminalStatusBadge').style.background = '#2563eb';
-                isTerminaliKameraAcik = true;
-
-                isTerminaliScanner = new Html5Qrcode("isTerminaliReader");
-                const config = { fps: 10, qrbox: { width: 250, height: 250 } };
-
-                Html5Qrcode.getCameras().then(cameras => {
-                    if (cameras && cameras.length) {
-                        const cameraId = cameras[cameras.length - 1].id;
-                        isTerminaliScanner.start(
-                            cameraId, 
-                            config, 
-                            (decodedText) => {
-                                document.getElementById('terminalBarkodInput').value = decodedText;
-                                processBarkod(decodedText);
-                                isTerminaliKameraKapat();
-                            },
-                            (errorMessage) => {}
-                        ).catch(err => {
-                            showToast('Kamera başlatılamadı: ' + err, 'error');
-                            isTerminaliKameraKapat();
-                        });
-                    } else {
-                        showToast('Kamera bulunamadı!', 'error');
-                        isTerminaliKameraKapat();
-                    }
-                }).catch(err => {
-                    showToast('Kamera erişim hatası: ' + err, 'error');
-                    isTerminaliKameraKapat();
-                });
-            } else {
-                isTerminaliKameraKapat();
-            }
-        }
-
-        function isTerminaliKameraKapat() {
-            const cameraArea = document.getElementById('isTerminaliCameraArea');
-            const btn = document.getElementById('btnIsTerminaliKamera');
-            const icon = document.getElementById('scannerIcon');
-
-            if (isTerminaliScanner) {
-                try { isTerminaliScanner.stop(); } catch(e) {}
-                isTerminaliScanner = null;
-            }
-
-            cameraArea.style.display = 'none';
-            btn.innerHTML = '<i class="fas fa-camera"></i> KAMERA AÇ';
-            icon.classList.remove('camera-active');
-            updateTerminalBadge();
-            isTerminaliKameraAcik = false;
-        }
-
         function renderTerminal() { 
             renderIsTuruGrid(); 
             renderTerminalKayitlar(); 
@@ -2572,7 +2406,7 @@
                     toplamalar.push({
                         id: uuid(), calisan_id: calisan.id, tarih: t, kg: kg,
                         birim_fiyat: birimFiyat, tutar: toplamaTutar,
-                        not: 'İş terminali toplama kaydı',
+                        not: 'El terminali toplama kaydı',
                         yil: parseInt(t.split('-')[0]),
                         zaman: new Date().toISOString()
                     });
@@ -2697,14 +2531,14 @@
                 if (sonrakiCikis) { 
                     // Toplama çıkışı ise toplama kaydını da sil
                     if (sonrakiCikis.is_turu === 'Toplama') {
-                        DB.set('toplamalar', DB.get('toplamalar', []).filter(tp => !(tp.calisan_id === sonrakiCikis.calisan_id && tp.tarih === sonrakiCikis.tarih && tp.not === 'İş terminali toplama kaydı')));
+                        DB.set('toplamalar', DB.get('toplamalar', []).filter(tp => !(tp.calisan_id === sonrakiCikis.calisan_id && tp.tarih === sonrakiCikis.tarih && tp.not === 'El terminali toplama kaydı')));
                     }
                     DB.set('girisler', girisler.filter(g => g.id !== sonrakiCikis.id)); 
                 }
             }
             // İlgili toplama kaydını da sil (varsa) - Toplama kayıtları için
             if (kayit.is_turu === 'Toplama') {
-                DB.set('toplamalar', DB.get('toplamalar', []).filter(t => !(t.calisan_id === kayit.calisan_id && t.tarih === kayit.tarih && t.not === 'İş terminali toplama kaydı')));
+                DB.set('toplamalar', DB.get('toplamalar', []).filter(t => !(t.calisan_id === kayit.calisan_id && t.tarih === kayit.tarih && t.not === 'El terminali toplama kaydı')));
             }
             DB.set('girisler', DB.get('girisler', []).filter(g => g.id !== id));
             renderTerminalKayitlar(); updateTerminalBadge(); renderDashboard();
@@ -2722,6 +2556,8 @@
         // ===================== SAHADA İŞÇİ KONTROLÜ =====================
         let sahadaKontrolScanner = null;
         let sahadaKontrolKameraAcik = false;
+        let isTerminaliScanner = null;
+        let isTerminaliKameraAcik = false;
 
         function renderSahadaKontrol() {
             document.getElementById('sahadaKontrolBarkodInput').focus();
@@ -2864,6 +2700,69 @@
             } else {
                 showToast('İşçi bilgileri: ' + calisan.ad + ' ' + calisan.soyad, 'success');
             }
+        }
+
+        // İş Terminali Kamera Fonksiyonları
+        function isTerminaliKameraToggle() {
+            const cameraArea = document.getElementById('isTerminaliCameraArea');
+            const btn = document.getElementById('btnIsTerminaliKamera');
+            const icon = document.getElementById('scannerIcon');
+
+            if (!isTerminaliKameraAcik) {
+                cameraArea.style.display = 'block';
+                btn.innerHTML = '<i class="fas fa-stop"></i> KAMERA KAPAT';
+                icon.classList.add('camera-active');
+                document.getElementById('terminalStatusBadge').textContent = 'Kamera Açık';
+                document.getElementById('terminalStatusBadge').style.background = '#2563eb';
+                isTerminaliKameraAcik = true;
+
+                isTerminaliScanner = new Html5Qrcode("isTerminaliReader");
+                const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+
+                Html5Qrcode.getCameras().then(cameras => {
+                    if (cameras && cameras.length) {
+                        const cameraId = cameras[cameras.length - 1].id;
+                        isTerminaliScanner.start(
+                            cameraId, 
+                            config, 
+                            (decodedText) => {
+                                document.getElementById('terminalBarkodInput').value = decodedText;
+                                processBarkod(decodedText);
+                                isTerminaliKameraKapat();
+                            },
+                            (errorMessage) => {}
+                        ).catch(err => {
+                            showToast('Kamera başlatılamadı: ' + err, 'error');
+                            isTerminaliKameraKapat();
+                        });
+                    } else {
+                        showToast('Kamera bulunamadı!', 'error');
+                        isTerminaliKameraKapat();
+                    }
+                }).catch(err => {
+                    showToast('Kamera erişim hatası: ' + err, 'error');
+                    isTerminaliKameraKapat();
+                });
+            } else {
+                isTerminaliKameraKapat();
+            }
+        }
+
+        function isTerminaliKameraKapat() {
+            const cameraArea = document.getElementById('isTerminaliCameraArea');
+            const btn = document.getElementById('btnIsTerminaliKamera');
+            const icon = document.getElementById('scannerIcon');
+
+            if (isTerminaliScanner) {
+                try { isTerminaliScanner.stop(); } catch(e) {}
+                isTerminaliScanner = null;
+            }
+
+            cameraArea.style.display = 'none';
+            btn.innerHTML = '<i class="fas fa-camera"></i> KAMERA AÇ';
+            icon.classList.remove('camera-active');
+            updateTerminalBadge();
+            isTerminaliKameraAcik = false;
         }
 
         // ===================== TOPLAMA / HASAT =====================
@@ -3534,7 +3433,7 @@
             const printWindow = window.open('', '_blank');
             let h = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Günlük Toplama Raporu</title>';
             h += '<style>@page { size: A4 portrait; margin: 15mm; } body { font-family: Arial, sans-serif; font-size: 10pt; } h2 { text-align: center; margin-bottom: 5px; } .sub { text-align: center; color: #666; font-size: 9pt; margin-bottom: 15px; } .ozet { display: flex; justify-content: space-around; margin-bottom: 20px; padding: 10px; background: #f0f9f0; border: 1px solid #1a5d3a; border-radius: 8px; } .ozet-item { text-align: center; } .ozet-item .val { font-size: 1.4rem; font-weight: bold; color: #1a5d3a; } .ozet-item .lbl { font-size: 0.8rem; color: #666; } table { width: 100%; border-collapse: collapse; margin-top: 10px; } th, td { border: 1px solid #333; padding: 6px 8px; text-align: left; font-size: 9.5pt; } th { background: #1a5d3a; color: white; font-weight: bold; } tr:nth-child(even) { background: #f5f5f5; } .no { text-align: center; width: 40px; } .tutar { text-align: right; font-weight: bold; color: #1a5d3a; }</style>';
-</head><body>';
+            h += '</head><body>';
             h += '<h2>SEBAT GÜLYAĞI - GÜNLÜK TOPLAMA RAPORU</h2>';
             h += '<div class="sub">Tarih: ' + (filterTarih ? new Date(filterTarih).toLocaleDateString('tr-TR') : 'Tüm Tarihler') + '</div>';
             h += '<div class="ozet"><div class="ozet-item"><div class="val">' + toplamalar.length + '</div><div class="lbl">Kayıt Sayısı</div></div><div class="ozet-item"><div class="val">' + toplamKg.toFixed(2) + ' kg</div><div class="lbl">Toplam KG</div></div><div class="ozet-item"><div class="val">' + toplamTutar.toFixed(2) + ' ₺</div><div class="lbl">Toplam Tutar</div></div></div>';
@@ -3545,12 +3444,75 @@
             });
             h += '</tbody></table>';
             h += '<div style="margin-top:20px;font-size:8pt;color:#666;text-align:center;">Sebat Gülyağı Tarım İşletme Takip Sistemi v12 | Günlük Rapor</div>';
-            h += '
-        
-    <!-- Service Worker disabled - not supported in this hosting environment -->
+            h += '</body></html>';
+            printWindow.document.write(h);
+            printWindow.document.close();
+            setTimeout(() => { printWindow.print(); }, 300);
+        }
 
+        function printToplamaOzet() {
+            const filterTarih = document.getElementById('toplamaFilterTarih').value;
+            const filterIsci = document.getElementById('toplamaFilterIsci').value;
+            const calisanlar = DB.get('calisanlar', []);
+            let toplamalar = DB.get('toplamalar', []);
+            if (filterTarih) toplamalar = toplamalar.filter(t => t.tarih === filterTarih);
+            if (filterIsci) toplamalar = toplamalar.filter(t => t.calisan_id === filterIsci);
 
-</body></html>';
+            const ozet = {};
+            toplamalar.forEach(t => {
+                if (!ozet[t.calisan_id]) ozet[t.calisan_id] = { kg: 0, tutar: 0, sayi: 0 };
+                ozet[t.calisan_id].kg += t.kg;
+                ozet[t.calisan_id].tutar += t.tutar;
+                ozet[t.calisan_id].sayi += 1;
+            });
+
+            const toplamKg = toplamalar.reduce((s, t) => s + t.kg, 0);
+            const toplamTutar = toplamalar.reduce((s, t) => s + t.tutar, 0);
+
+            const printWindow = window.open('', '_blank');
+            let h = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Toplama Özet Raporu</title>';
+            h += '<style>@page { size: A4 portrait; margin: 15mm; } body { font-family: Arial, sans-serif; font-size: 10pt; } h2 { text-align: center; margin-bottom: 5px; } .sub { text-align: center; color: #666; font-size: 9pt; margin-bottom: 15px; } .ozet { display: flex; justify-content: space-around; margin-bottom: 20px; padding: 10px; background: #f0f9f0; border: 1px solid #1a5d3a; border-radius: 8px; } .ozet-item { text-align: center; } .ozet-item .val { font-size: 1.4rem; font-weight: bold; color: #1a5d3a; } .ozet-item .lbl { font-size: 0.8rem; color: #666; } table { width: 100%; border-collapse: collapse; margin-top: 10px; } th, td { border: 1px solid #333; padding: 6px 8px; text-align: left; font-size: 9.5pt; } th { background: #1a5d3a; color: white; font-weight: bold; } tr:nth-child(even) { background: #f5f5f5; } .no { text-align: center; width: 40px; } .tutar { text-align: right; font-weight: bold; color: #1a5d3a; }</style>';
+            h += '</head><body>';
+            h += '<h2>SEBAT GÜLYAĞI - TOPLAMA ÖZET RAPORU</h2>';
+            h += '<div class="sub">' + (filterTarih ? 'Tarih: ' + new Date(filterTarih).toLocaleDateString('tr-TR') : 'Tüm Tarihler') + ' | Toplam İşçi: ' + Object.keys(ozet).length + '</div>';
+            h += '<div class="ozet"><div class="ozet-item"><div class="val">' + toplamalar.length + '</div><div class="lbl">Toplam Kayıt</div></div><div class="ozet-item"><div class="val">' + toplamKg.toFixed(2) + ' kg</div><div class="lbl">Toplam KG</div></div><div class="ozet-item"><div class="val">' + toplamTutar.toFixed(2) + ' ₺</div><div class="lbl">Toplam Tutar</div></div></div>';
+            h += '<table><thead><tr><th class="no">No</th><th>İşçi</th><th>Toplam KG</th><th>Kayıt Sayısı</th><th class="tutar">Toplam Tutar</th></tr></thead><tbody>';
+            Object.entries(ozet).forEach(([cid, data], i) => {
+                const c = calisanlar.find(x => x.id === cid);
+                h += '<tr><td class="no">' + (i+1) + '</td><td><strong>' + (c ? c.ad + ' ' + c.soyad : 'Bilinmiyor') + '</strong></td><td>' + data.kg.toFixed(2) + ' kg</td><td>' + data.sayi + '</td><td class="tutar">' + data.tutar.toFixed(2) + ' ₺</td></tr>';
+            });
+            h += '</tbody></table>';
+            h += '<div style="margin-top:20px;font-size:8pt;color:#666;text-align:center;">Sebat Gülyağı Tarım İşletme Takip Sistemi v12 | Özet Rapor</div>';
+            h += '</body></html>';
+            printWindow.document.write(h);
+            printWindow.document.close();
+            setTimeout(() => { printWindow.print(); }, 300);
+        }
+
+        function printUygulamalarRaporu() {
+            const baslangic = document.getElementById('uygulamaFilterBaslangic').value;
+            const bitis = document.getElementById('uygulamaFilterBitis').value;
+            const tur = document.getElementById('uygulamaFilterTur').value;
+            let uygulamalar = DB.get('uygulamalar', []);
+            if (baslangic) uygulamalar = uygulamalar.filter(u => u.uygulama_tarihi >= baslangic);
+            if (bitis) uygulamalar = uygulamalar.filter(u => u.uygulama_tarihi <= bitis);
+            if (tur) uygulamalar = uygulamalar.filter(u => u.uygulama_turu === tur);
+            const araziler = DB.get('araziler', []);
+
+            const printWindow = window.open('', '_blank');
+            let h = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Arazi Uygulama Raporu</title>';
+            h += '<style>@page { size: A4 landscape; margin: 15mm; } body { font-family: Arial, sans-serif; font-size: 10pt; } h2 { text-align: center; margin-bottom: 5px; } .sub { text-align: center; color: #666; font-size: 9pt; margin-bottom: 15px; } table { width: 100%; border-collapse: collapse; margin-top: 10px; } th, td { border: 1px solid #333; padding: 6px 8px; text-align: left; font-size: 9.5pt; } th { background: #1a5d3a; color: white; font-weight: bold; } tr:nth-child(even) { background: #f5f5f5; } .no { text-align: center; width: 40px; } .tur { background: #dbeafe; color: #1e40af; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: 600; }</style>';
+            h += '</head><body>';
+            h += '<h2>SEBAT GÜLYAĞI - ARAZİ UYGULAMA RAPORU</h2>';
+            h += '<div class="sub">' + (baslangic ? 'Başlangıç: ' + new Date(baslangic).toLocaleDateString('tr-TR') : '') + (bitis ? ' | Bitiş: ' + new Date(bitis).toLocaleDateString('tr-TR') : '') + (tur ? ' | Tür: ' + tur : '') + ' | Toplam: ' + uygulamalar.length + ' kayıt</div>';
+            h += '<table><thead><tr><th class="no">No</th><th>Tarih</th><th>Arazi</th><th>Uygulama Türü</th><th>Açıklama</th><th>Kaydeden</th></tr></thead><tbody>';
+            uygulamalar.forEach((u, i) => {
+                const a = araziler.find(x => x.id === u.arazi_id);
+                h += '<tr><td class="no">' + (i+1) + '</td><td>' + new Date(u.uygulama_tarihi).toLocaleDateString('tr-TR') + '</td><td><strong>' + (a ? a.arazi_adi : '-') + '</strong></td><td><span class="tur">' + u.uygulama_turu + '</span></td><td>' + (u.aciklama || '-') + '</td><td>' + (u.kaydeden || '-') + '</td></tr>';
+            });
+            h += '</tbody></table>';
+            h += '<div style="margin-top:20px;font-size:8pt;color:#666;text-align:center;">Sebat Gülyağı Tarım İşletme Takip Sistemi v12 | Arazi Uygulama Raporu</div>';
+            h += '</body></html>';
             printWindow.document.write(h);
             printWindow.document.close();
             setTimeout(() => { printWindow.print(); }, 300);
@@ -3561,7 +3523,7 @@
             const printWindow = window.open('', '_blank');
             let html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>İşçi Listesi</title>';
             html += '<style>@page { size: A4 portrait; margin: 15mm; } body { font-family: Arial, sans-serif; font-size: 10pt; } h2 { text-align: center; margin-bottom: 5px; } .sub { text-align: center; color: #666; font-size: 9pt; margin-bottom: 15px; } table { width: 100%; border-collapse: collapse; } th, td { border: 1px solid #333; padding: 6px 8px; text-align: left; font-size: 9.5pt; } th { background: #1a5d3a; color: white; font-weight: bold; } tr:nth-child(even) { background: #f5f5f5; } .no { text-align: center; width: 40px; } .tc { font-family: monospace; letter-spacing: 1px; }</style>';
-</head><body>';
+            html += '</head><body>';
             html += '<h2>SEBAT GÜLYAĞI - TARIM İŞLETMESİ</h2>';
             html += '<div class="sub">İşçi Listesi | Tarih: ' + new Date().toLocaleDateString('tr-TR') + ' | Toplam: ' + calisanlar.length + ' kişi</div>';
             html += '<table><thead><tr><th class="no">No</th><th>Ad Soyad</th><th class="tc">TC Kimlik No</th><th>Yaş</th></tr></thead><tbody>';
@@ -3570,14 +3532,7 @@
             });
             html += '</tbody></table>';
             html += '<div style="margin-top:20px;font-size:8pt;color:#666;text-align:center;">Sebat Gülyağı Tarım İşletme Takip Sistemi v12</div>';
-            html += '
-    <!-- Service Worker for Offline Support -->
-    <script>
-        
-    <!-- SW registration removed -->
-
-
-</body></html>';
+            html += '</body></html>';
             printWindow.document.write(html);
             printWindow.document.close();
             setTimeout(() => { printWindow.print(); }, 300);
@@ -3640,7 +3595,7 @@
             html += '<div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">';
             html += '<div class="card-title"><i class="fas fa-calendar-day"></i> Günlük Giriş/Çıkış Raporu</div>';
             html += '<div style="display:flex;gap:12px;align-items:center;">';
-            html += '<input type="date" class="form-input no-print" id="raporGunlukTarih">';
+            html += '<input type="date" class="form-input no-print" id="raporGunlukTarih" value="' + todayStr() + '">';
             html += '<button class="btn btn-primary btn-sm no-print" id="btnRaporGunluk"><i class="fas fa-search"></i> Raporla</button>';
             html += '<button class="btn btn-sm btn-secondary no-print" onclick="window.print()"><i class="fas fa-print"></i> Yazdır</button>';
             html += '</div></div>';
@@ -3972,8 +3927,6 @@
 
         
         // ===================== MOBILE & TABLET ENHANCEMENTS =====================
-
-        // Touch swipe for sidebar (mobile)
         let touchStartX = 0;
         let touchEndX = 0;
 
@@ -3991,17 +3944,13 @@
             const swipeThreshold = 80;
             const diff = touchEndX - touchStartX;
 
-            // Swipe right from left edge -> open sidebar
             if (diff > swipeThreshold && touchStartX < 50) {
                 sidebar.classList.add('open');
-            }
-            // Swipe left -> close sidebar
-            else if (diff < -swipeThreshold && sidebar.classList.contains('open')) {
+            } else if (diff < -swipeThreshold && sidebar.classList.contains('open')) {
                 sidebar.classList.remove('open');
             }
         }
 
-        // Close sidebar when clicking outside on mobile
         document.addEventListener('click', e => {
             const sidebar = document.getElementById('sidebar');
             const mobileToggle = document.getElementById('mobileToggle');
@@ -4014,90 +3963,35 @@
             }
         });
 
-        // Virtual keyboard handling for mobile
         const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
         if (isMobile) {
-            // Prevent zoom on input focus (iOS)
             document.querySelectorAll('input, select, textarea').forEach(el => {
-                el.addEventListener('focus', () => {
-                    document.body.classList.add('keyboard-open');
-                });
-                el.addEventListener('blur', () => {
-                    document.body.classList.remove('keyboard-open');
-                });
-            });
-
-            // Auto-focus barkod input on terminal pages
-            document.querySelectorAll('.nav-item[data-page="terminal"], .nav-item[data-page="sahada-kontrol"]').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    setTimeout(() => {
-                        const input = document.querySelector('.terminal-input:not([readonly])');
-                        if (input) input.focus();
-                    }, 300);
-                });
+                el.addEventListener('focus', () => document.body.classList.add('keyboard-open'));
+                el.addEventListener('blur', () => document.body.classList.remove('keyboard-open'));
             });
         }
 
-        // Orientation change handler
         window.addEventListener('orientationchange', () => {
             setTimeout(() => {
                 const sidebar = document.getElementById('sidebar');
-                if (window.innerWidth > 768) {
-                    sidebar.classList.remove('open');
-                }
+                if (window.innerWidth > 768) sidebar.classList.remove('open');
             }, 100);
         });
 
-        // Resize handler for responsive adjustments
         let resizeTimer;
         window.addEventListener('resize', () => {
             clearTimeout(resizeTimer);
             resizeTimer = setTimeout(() => {
                 const sidebar = document.getElementById('sidebar');
-                if (window.innerWidth > 768) {
-                    sidebar.classList.remove('open');
-                }
+                if (window.innerWidth > 768) sidebar.classList.remove('open');
             }, 250);
         });
 
-        // Prevent double-tap zoom on buttons
-        document.querySelectorAll('.btn, .nav-item, .tab, .is-turu-btn, .terminal-btn, .list-item-btn').forEach(el => {
-            el.addEventListener('touchend', e => {
-                e.preventDefault();
-                el.click();
-            }, { passive: false });
-        });
-
-        // Vibration feedback for supported devices
         function vibrate(pattern) {
-            if (navigator.vibrate) {
-                navigator.vibrate(pattern);
-            }
+            if (navigator.vibrate) navigator.vibrate(pattern);
         }
 
-        // Add vibration to terminal actions
-        const originalProcessBarkod = processBarkod;
-        processBarkod = function(barkod) {
-            vibrate(50);
-            return originalProcessBarkod(barkod);
-        };
-
-        // Battery status indicator (if supported)
-        if ('getBattery' in navigator) {
-            navigator.getBattery().then(battery => {
-                const updateBattery = () => {
-                    const level = Math.round(battery.level * 100);
-                    if (level < 20 && !battery.charging) {
-                        showToast('Pil seviyesi düşük: %' + level, 'warning');
-                    }
-                };
-                battery.addEventListener('levelchange', updateBattery);
-                updateBattery();
-            });
-        }
-
-        // Network status monitoring
         window.addEventListener('online', () => {
             showToast('İnternet bağlantısı sağlandı', 'success');
             if (cloudActive) setCloudStatus('online');
@@ -4108,48 +4002,6 @@
             setCloudStatus('offline');
         });
 
-        // Wake lock for terminal pages (keep screen on)
-        let wakeLock = null;
-        async function requestWakeLock() {
-            if ('wakeLock' in navigator) {
-                try {
-                    wakeLock = await navigator.wakeLock.request('screen');
-                } catch (err) {
-                    console.log('Wake lock hatası:', err);
-                }
-            }
-        }
-
-        async function releaseWakeLock() {
-            if (wakeLock) {
-                try {
-                    await wakeLock.release();
-                    wakeLock = null;
-                } catch (err) {
-                    console.log('Wake lock release hatası:', err);
-                }
-            }
-        }
-
-        // Enable wake lock on terminal pages
-        document.querySelectorAll('.nav-item[data-page="terminal"], .nav-item[data-page="sahada-kontrol"]').forEach(btn => {
-            btn.addEventListener('click', requestWakeLock);
-        });
-
-        document.querySelectorAll('.nav-item:not([data-page="terminal"]):not([data-page="sahada-kontrol"])').forEach(btn => {
-            btn.addEventListener('click', releaseWakeLock);
-        });
-
-        // Visibility change handler for wake lock
-        document.addEventListener('visibilitychange', () => {
-            if (document.visibilityState === 'visible') {
-                const activePage = document.querySelector('.page-section:not(.hidden)');
-                if (activePage && (activePage.id === 'page-terminal' || activePage.id === 'page-sahada-kontrol')) {
-                    requestWakeLock();
-                }
-            }
-        });
-
         // ===================== INIT =====================
         window.addEventListener('DOMContentLoaded', async () => {
             await initCloudData();
@@ -4157,61 +4009,5 @@
             checkSession();
         });
     </script>
-
-    <!-- Service Worker for Offline Support -->
-    <script>
-        if ('serviceWorker' in navigator) {
-            const swCode = `
-                const CACHE_NAME = 'sebat-v12-cache-v1';
-                const urlsToCache = [
-                    './',
-                    'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
-                    'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap',
-                    'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js',
-                    'https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.11.5/JsBarcode.all.min.js',
-                    'https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js',
-                    'https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js',
-                    'https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js'
-                ];
-
-                self.addEventListener('install', event => {
-                    event.waitUntil(
-                        caches.open(CACHE_NAME)
-                            .then(cache => cache.addAll(urlsToCache))
-                    );
-                });
-
-                self.addEventListener('fetch', event => {
-                    event.respondWith(
-                        caches.match(event.request)
-                            .then(response => {
-                                if (response) return response;
-                                return fetch(event.request).catch(() => {
-                                    if (event.request.destination === 'document') {
-                                        return new Response('<html><body style="display:flex;align-items:center;justify-content:center;height:100vh;margin:0;font-family:Inter,sans-serif;background:#1a5d3a;color:white;text-align:center;"><div><i class="fas fa-wifi" style="font-size:3rem;margin-bottom:1rem;"></i><h2>Çevrimdışı Mod</h2><p>İnternet bağlantınız yok. Veriler yerel olarak saklanmaya devam ediyor.</p></div></body></html>', { headers: { 'Content-Type': 'text/html' } });
-                                    }
-                                });
-                            })
-                    );
-                });
-
-                self.addEventListener('activate', event => {
-                    event.waitUntil(
-                        caches.keys().then(cacheNames => {
-                            return Promise.all(
-                                cacheNames.filter(name => name !== CACHE_NAME)
-                                    .map(name => caches.delete(name))
-                            );
-                        })
-                    );
-                });
-            `;
-
-            const blob = new Blob([swCode], { type: 'application/javascript' });
-            const swUrl = URL.createObjectURL(blob);
-            navigator.serviceWorker.register(swUrl).catch(err => console.log('SW kaydı başarısız:', err));
-        }
-    </script>
-
 </body>
 </html>
