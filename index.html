@@ -791,8 +791,12 @@
                             <div><div class="stat-value" id="statToplamCalisan">0</div><div class="stat-label">Toplam İşçi</div></div>
                         </div>
                         <div class="stat-card">
-                            <div class="stat-icon blue"><i class="fas fa-door-open"></i></div>
-                            <div><div class="stat-value" id="statAktifGiris">0</div><div class="stat-label">Aktif Giriş (Bugün)</div></div>
+                            <div class="stat-icon blue"><i class="fas fa-users"></i></div>
+                            <div><div class="stat-value" id="statBugunCalisan">0</div><div class="stat-label">Bugün Çalışan İşçi</div></div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon green"><i class="fas fa-walking"></i></div>
+                            <div><div class="stat-value" id="statSahadaSimdi">0</div><div class="stat-label">Şu An Sahada</div></div>
                         </div>
                         <div class="stat-card">
                             <div class="stat-icon purple"><i class="fas fa-weight-hanging"></i></div>
@@ -800,7 +804,7 @@
                         </div>
                         <div class="stat-card">
                             <div class="stat-icon orange"><i class="fas fa-clipboard-list"></i></div>
-                            <div><div class="stat-value" id="statToplamGunluk">0</div><div class="stat-label">Bugünkü Gün Sayısı</div></div>
+                            <div><div class="stat-value" id="statToplamYevmiye">0</div><div class="stat-label">Bugünkü Yevmiye Sayısı</div></div>
                         </div>
                     </div>
 
@@ -1271,6 +1275,13 @@
                                 <input type="text" class="form-input" id="toplamaBarkod" placeholder="Barkod okutun veya girin..." style="flex:1;">
                                 <button type="button" class="btn btn-secondary" id="btnToplamaBarkodAra"><i class="fas fa-search"></i></button>
                             </div>
+                            <!-- Kamera Tarama Alanı -->
+                            <div id="toplamaCameraArea" style="margin: 12px 0; border-radius: 12px; overflow: hidden; border: 2px solid var(--gray-border); background: var(--gray-light); display: none;">
+                                <div id="toplamaReader" style="width: 100%; min-height: 200px;"></div>
+                            </div>
+                            <div style="display:flex;gap:8px;margin-top:8px;">
+                                <button type="button" class="btn btn-primary" id="btnToplamaKamera" style="flex:1;"><i class="fas fa-camera"></i> KAMERA AÇ</button>
+                            </div>
                             <div id="toplamaBarkodSonuc" style="margin-top:8px;font-size:0.875rem;"></div>
                         </div>
                         <div class="form-group" style="grid-column: 1 / -1;">
@@ -1734,7 +1745,7 @@
 
             const kullanicilar = DB.get('kullanicilar', []);
             if (kullanicilar.length === 0) {
-                DB.set('kullanicilar', [{ id: uuid(), username: 'admin', password: '553553', rol: 'admin', olusturma_tarihi: new Date().toISOString() }]);
+                DB.set('kullanicilar', [{ id: uuid(), username: 'admin', password: '2329600', rol: 'admin', olusturma_tarihi: new Date().toISOString() }]);
             }
             if (!DB.get('initialized')) {
                 DB.set('calisanlar', []);
@@ -2005,6 +2016,7 @@
             document.getElementById('btnYeniToplama').addEventListener('click', openToplamaModal);
             document.getElementById('btnSaveToplama').addEventListener('click', submitToplamaForm);
             document.getElementById('btnToplamaBarkodAra').addEventListener('click', toplamaBarkodAra);
+            document.getElementById('btnToplamaKamera').addEventListener('click', toplamaKameraToggle);
             document.getElementById('toplamaBarkod').addEventListener('keydown', function(e) {
                 if (e.key === 'Enter') toplamaBarkodAra();
             });
@@ -3353,6 +3365,64 @@
         }
 
         // ===================== ARA ÖDEME FONKSİYONLARI =====================
+        let toplamaScanner = null;
+        let toplamaKameraAcik = false;
+
+        function toplamaKameraToggle() {
+            const cameraArea = document.getElementById('toplamaCameraArea');
+            const btn = document.getElementById('btnToplamaKamera');
+
+            if (!toplamaKameraAcik) {
+                cameraArea.style.display = 'block';
+                btn.innerHTML = '<i class="fas fa-stop"></i> KAMERA KAPAT';
+                toplamaKameraAcik = true;
+
+                toplamaScanner = new Html5Qrcode("toplamaReader");
+                const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+
+                Html5Qrcode.getCameras().then(cameras => {
+                    if (cameras && cameras.length) {
+                        const cameraId = cameras[cameras.length - 1].id;
+                        toplamaScanner.start(
+                            cameraId, 
+                            config, 
+                            (decodedText) => {
+                                document.getElementById('toplamaBarkod').value = decodedText;
+                                toplamaBarkodAra();
+                                toplamaKameraKapat();
+                            },
+                            (errorMessage) => {}
+                        ).catch(err => {
+                            showToast('Kamera başlatılamadı: ' + err, 'error');
+                            toplamaKameraKapat();
+                        });
+                    } else {
+                        showToast('Kamera bulunamadı!', 'error');
+                        toplamaKameraKapat();
+                    }
+                }).catch(err => {
+                    showToast('Kamera erişim hatası: ' + err, 'error');
+                    toplamaKameraKapat();
+                });
+            } else {
+                toplamaKameraKapat();
+            }
+        }
+
+        function toplamaKameraKapat() {
+            const cameraArea = document.getElementById('toplamaCameraArea');
+            const btn = document.getElementById('btnToplamaKamera');
+
+            if (toplamaScanner) {
+                try { toplamaScanner.stop(); } catch(e) {}
+                toplamaScanner = null;
+            }
+
+            cameraArea.style.display = 'none';
+            btn.innerHTML = '<i class="fas fa-camera"></i> KAMERA AÇ';
+            toplamaKameraAcik = false;
+        }
+
         function araOdemeBarkodAra() {
             const barkod = document.getElementById('araOdemeBarkod').value.trim();
             if (!barkod) { showToast('Barkod numarası girin!', 'warning'); return; }
@@ -3735,13 +3805,17 @@
         }
         function raporHasat() {
             let html = '<div class="card rapor-print">';
-            html += '<div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">';
+            html += '<div class="card-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">';
             html += '<div class="card-title"><i class="fas fa-weight-hanging"></i> Hasat / Toplama Raporu</div>';
-            html += '<div style="display:flex;gap:12px;align-items:center;">';
-            html += '<select class="form-select no-print" id="raporHasatYil"></select>';
-            html += '<select class="form-select no-print" id="raporHasatAy"><option value="">Tüm Aylar</option>';
+            html += '<div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">';
+            html += '<select class="form-select no-print" id="raporHasatYil" style="min-width:100px;"></select>';
+            html += '<select class="form-select no-print" id="raporHasatAy" style="min-width:120px;"><option value="">Tüm Aylar</option>';
             for (let i=1;i<=12;i++) html += '<option value="' + i + '">' + AYLAR[i] + '</option>';
             html += '</select>';
+            html += '<label class="no-print" style="font-size:0.875rem;color:var(--gray);font-weight:500;">Başlangıç:</label>';
+            html += '<input type="date" class="form-input no-print" id="raporHasatBaslangic" style="width:140px;">';
+            html += '<label class="no-print" style="font-size:0.875rem;color:var(--gray);font-weight:500;">Bitiş:</label>';
+            html += '<input type="date" class="form-input no-print" id="raporHasatBitis" style="width:140px;">';
             html += '<button class="btn btn-primary btn-sm no-print" id="btnRaporHasat"><i class="fas fa-search"></i> Raporla</button>';
             html += '<button class="btn btn-sm btn-secondary no-print" onclick="window.print()"><i class="fas fa-print"></i> Yazdır</button>';
             html += '</div></div>';
@@ -3754,37 +3828,95 @@
             for (let y = mevcutYil - 3; y <= mevcutYil + 1; y++) { yilHtml += '<option value="' + y + '" ' + (y === mevcutYil ? 'selected' : '') + '>' + y + '</option>'; }
             yilSelect.innerHTML = yilHtml;
 
+            // Varsayılan tarih aralığı: bu ayın başından bugüne
+            const now = new Date();
+            const baslangic = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+            const bitis = now.toISOString().split('T')[0];
+            document.getElementById('raporHasatBaslangic').value = baslangic;
+            document.getElementById('raporHasatBitis').value = bitis;
+            document.getElementById('raporHasatAy').value = now.getMonth() + 1;
+
             document.getElementById('btnRaporHasat').addEventListener('click', raporHasatRaporla);
             document.getElementById('raporHasatYil').addEventListener('change', raporHasatRaporla);
             document.getElementById('raporHasatAy').addEventListener('change', raporHasatRaporla);
+            document.getElementById('raporHasatBaslangic').addEventListener('change', raporHasatRaporla);
+            document.getElementById('raporHasatBitis').addEventListener('change', raporHasatRaporla);
             raporHasatRaporla();
         }
         function raporHasatRaporla() {
             const yil = parseInt(document.getElementById('raporHasatYil').value);
             const ay = document.getElementById('raporHasatAy').value;
+            const baslangic = document.getElementById('raporHasatBaslangic').value;
+            const bitis = document.getElementById('raporHasatBitis').value;
             const calisanlar = DB.get('calisanlar', []);
-            let toplamalar = DB.get('toplamalar', []).filter(t => t.yil === yil);
+            let toplamalar = DB.get('toplamalar', []);
+
+            // Yıl filtresi
+            toplamalar = toplamalar.filter(t => t.yil === yil);
+
+            // Ay filtresi
             if (ay) {
                 const ayNum = parseInt(ay);
                 toplamalar = toplamalar.filter(t => { const d = new Date(t.tarih); return d.getMonth() + 1 === ayNum; });
             }
+
+            // Tarih aralığı filtresi
+            if (baslangic) toplamalar = toplamalar.filter(t => t.tarih >= baslangic);
+            if (bitis) toplamalar = toplamalar.filter(t => t.tarih <= bitis);
+
+            // Günlük özet
+            const gunlukOzet = {};
+            toplamalar.forEach(t => {
+                if (!gunlukOzet[t.tarih]) gunlukOzet[t.tarih] = { kg: 0, tutar: 0, sayi: 0, isciler: [] };
+                gunlukOzet[t.tarih].kg += t.kg;
+                gunlukOzet[t.tarih].tutar += t.tutar;
+                gunlukOzet[t.tarih].sayi += 1;
+                const c = calisanlar.find(x => x.id === t.calisan_id);
+                if (c && !gunlukOzet[t.tarih].isciler.includes(c.ad + ' ' + c.soyad)) {
+                    gunlukOzet[t.tarih].isciler.push(c.ad + ' ' + c.soyad);
+                }
+            });
+
+            // İşçi bazlı özet
             const ozet = {};
             toplamalar.forEach(t => {
                 if (!ozet[t.calisan_id]) ozet[t.calisan_id] = { kg: 0, tutar: 0, sayi: 0 };
                 ozet[t.calisan_id].kg += t.kg; ozet[t.calisan_id].tutar += t.tutar; ozet[t.calisan_id].sayi += 1;
             });
+
             let content = '';
-            if (toplamalar.length === 0) { content = '<div style="padding:32px;text-align:center;color:var(--gray)">Bu dönem için toplama kaydı bulunmuyor</div>'; }
+            if (toplamalar.length === 0) { 
+                content = '<div style="padding:32px;text-align:center;color:var(--gray)">Seçilen dönem için toplama kaydı bulunmuyor</div>'; 
+            }
             else {
-                content = '<div class="table-container"><table><thead><tr><th>İşçi</th><th>Toplam KG</th><th>Birim Fiyat</th><th>Toplam Tutar</th><th>Kayıt Sayısı</th></tr></thead><tbody>';
-                Object.entries(ozet).forEach(([cid, data]) => {
+                const toplamKg = toplamalar.reduce((s, t) => s + t.kg, 0);
+                const toplamTutar = toplamalar.reduce((s, t) => s + t.tutar, 0);
+                const toplamGun = Object.keys(gunlukOzet).length;
+
+                // Özet kartlar
+                content = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:24px;">';
+                content += '<div class="stat-card"><div class="stat-icon purple"><i class="fas fa-weight-hanging"></i></div><div><div class="stat-value">' + toplamKg.toFixed(2) + ' kg</div><div class="stat-label">Toplam Toplanan</div></div></div>';
+                content += '<div class="stat-card"><div class="stat-icon green"><i class="fas fa-lira-sign"></i></div><div><div class="stat-value">' + toplamTutar.toFixed(2) + ' ₺</div><div class="stat-label">Toplam Tutar</div></div></div>';
+                content += '<div class="stat-card"><div class="stat-icon blue"><i class="fas fa-calendar-day"></i></div><div><div class="stat-value">' + toplamGun + '</div><div class="stat-label">Çalışma Günü</div></div></div>';
+                content += '<div class="stat-card"><div class="stat-icon orange"><i class="fas fa-users"></i></div><div><div class="stat-value">' + Object.keys(ozet).length + '</div><div class="stat-label">Çalışan İşçi</div></div></div>';
+                content += '</div>';
+
+                // Günlük detay tablosu
+                content += '<h3 style="margin:24px 0 16px;color:var(--dark);"><i class="fas fa-calendar-alt"></i> Günlük Detay</h3>';
+                content += '<div class="table-container" style="margin-bottom:24px;"><table><thead><tr><th>Tarih</th><th>Toplam KG</th><th>Tutar</th><th>Kayıt</th><th>Çalışanlar</th></tr></thead><tbody>';
+                Object.entries(gunlukOzet).sort((a,b) => b[0].localeCompare(a[0])).forEach(([tarih, data]) => {
+                    content += '<tr><td><strong>' + formatDate(tarih) + '</strong></td><td><strong style="color:var(--primary);">' + data.kg.toFixed(2) + ' kg</strong></td><td><strong>' + data.tutar.toFixed(2) + ' ₺</strong></td><td>' + data.sayi + '</td><td><span style="font-size:0.8rem;color:var(--gray);">' + data.isciler.join(', ') + '</span></td></tr>';
+                });
+                content += '</tbody></table></div>';
+
+                // İşçi bazlı özet
+                content += '<h3 style="margin:24px 0 16px;color:var(--dark);"><i class="fas fa-users"></i> İşçi Bazlı Özet</h3>';
+                content += '<div class="table-container"><table><thead><tr><th>İşçi</th><th>Toplam KG</th><th>Birim Fiyat</th><th>Toplam Tutar</th><th>Kayıt Sayısı</th></tr></thead><tbody>';
+                Object.entries(ozet).sort((a,b) => b[1].kg - a[1].kg).forEach(([cid, data]) => {
                     const c = calisanlar.find(x => x.id === cid);
                     content += '<tr><td><strong>' + (c ? c.ad+' '+c.soyad : 'Bilinmiyor') + '</strong></td><td><strong style="color:var(--primary);">' + data.kg.toFixed(2) + ' kg</strong></td><td>' + getKgUcreti().toFixed(2) + ' ₺/kg</td><td><strong>' + data.tutar.toFixed(2) + ' ₺</strong></td><td>' + data.sayi + '</td></tr>';
                 });
                 content += '</tbody></table></div>';
-                const toplamKg = toplamalar.reduce((s, t) => s + t.kg, 0);
-                const toplamTutar = toplamalar.reduce((s, t) => s + t.tutar, 0);
-                content = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px;"><div class="stat-card"><div class="stat-icon purple"><i class="fas fa-weight-hanging"></i></div><div><div class="stat-value">' + toplamKg.toFixed(2) + ' kg</div><div class="stat-label">Toplam Toplanan</div></div></div><div class="stat-card"><div class="stat-icon green"><i class="fas fa-lira-sign"></i></div><div><div class="stat-value">' + toplamTutar.toFixed(2) + ' ₺</div><div class="stat-label">Toplam Tutar</div></div></div></div>' + content;
             }
             document.getElementById('raporHasatContent').innerHTML = content;
         }
