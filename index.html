@@ -2330,9 +2330,9 @@
             openModal('barkodModal');
         }
         function createBarkodCard(c) {
-            
             const card = document.createElement('div');
             card.className = 'barkod-card';
+            card.innerHTML = '<div class="barkod-header">SEBAT GÜLYAĞI - TARIM İŞLETMESİ</div><div class="barkod-isci">' + c.ad.toUpperCase() + ' ' + c.soyad.toUpperCase() + '</div><svg id="barkod-svg-' + c.id + '"></svg><div class="barkod-kod">' + c.barkod + '</div>';
             return card;
         }
         function printBarkodlar(mode) {
