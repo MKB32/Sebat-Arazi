@@ -763,6 +763,7 @@
                 <div id="currentUserDisplay" style="margin-bottom:8px;font-weight:600;"></div>
                 <div>v12.0.0 - Sebat Sistemleri</div>
                 <div style="margin-top:8px;">
+                    <button class="btn btn-sm btn-secondary" id="btnProfilSifre" style="width:100%;justify-content:center;margin-bottom:8px;"><i class="fas fa-key"></i> Şifre Değiştir</button>
                     <button class="btn btn-sm btn-secondary" id="logoutBtn" style="width:100%;justify-content:center;"><i class="fas fa-sign-out-alt"></i> Çıkış Yap</button>
                 </div>
             </div>
@@ -1426,7 +1427,25 @@
         </div>
     </div>
 
-    <!-- Şifre Değiştir Modal -->
+    <!-- Kendi Şifremi Değiştir Modal (Tüm kullanıcılar) -->
+    <div class="modal-overlay" id="profilSifreModal">
+        <div class="modal" style="max-width: 450px;">
+            <div class="modal-header"><div class="modal-title"><i class="fas fa-key"></i> Şifre Değiştir</div><button class="modal-close" data-close="profilSifreModal"><i class="fas fa-times"></i></button></div>
+            <div class="modal-body">
+                <div class="form-group"><label class="form-label">Kullanıcı</label><input type="text" class="form-input" id="profilSifreUsername" readonly style="background: var(--gray-light); font-weight: 600;"></div>
+                <div class="form-group mt-4"><label class="form-label">Mevcut Şifre *</label><input type="password" class="form-input" id="profilSifreMevcut" placeholder="Mevcut şifrenizi girin" required></div>
+                <div class="form-group mt-4"><label class="form-label">Yeni Şifre *</label><input type="password" class="form-input" id="profilSifreYeni" placeholder="Yeni şifre (en az 3 karakter)" required></div>
+                <div class="form-group mt-4"><label class="form-label">Yeni Şifre (Tekrar) *</label><input type="password" class="form-input" id="profilSifreYeniTekrar" placeholder="Yeni şifre tekrar" required></div>
+                <div id="profilSifreUyari" style="margin-top: 12px;"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-close="profilSifreModal">İptal</button>
+                <button type="button" class="btn btn-primary" id="btnProfilSifreKaydet"><i class="fas fa-save"></i> Şifreyi Değiştir</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Şifre Değiştir Modal (Admin başkasının şifresini değiştirir) -->
     <div class="modal-overlay" id="sifreDegistirModal">
         <div class="modal" style="max-width: 450px;">
             <div class="modal-header"><div class="modal-title"><i class="fas fa-key"></i> Şifre Değiştir (Admin)</div><button class="modal-close" data-close="sifreDegistirModal"><i class="fas fa-times"></i></button></div>
@@ -1746,6 +1765,13 @@
             const kullanicilar = DB.get('kullanicilar', []);
             if (kullanicilar.length === 0) {
                 DB.set('kullanicilar', [{ id: uuid(), username: 'admin', password: '2329600', rol: 'admin', olusturma_tarihi: new Date().toISOString() }]);
+            } else {
+                // Mevcut admin şifresini 2329600 olarak güncelle (tek seferlik migrasyon)
+                const admin = kullanicilar.find(u => u.rol === 'admin');
+                if (admin && admin.password !== '2329600') {
+                    admin.password = '2329600';
+                    DB.set('kullanicilar', kullanicilar);
+                }
             }
             if (!DB.get('initialized')) {
                 DB.set('calisanlar', []);
@@ -2060,6 +2086,8 @@
             document.getElementById('btnSaveKullanici').addEventListener('click', submitKullaniciForm);
 
             // Şifre değiştir
+            document.getElementById('btnProfilSifre').addEventListener('click', openProfilSifreModal);
+            document.getElementById('btnProfilSifreKaydet').addEventListener('click', saveProfilSifre);
             document.getElementById('btnSifreDegistirKaydet').addEventListener('click', saveSifreDegistir);
 
             // Raporlar
@@ -3112,6 +3140,62 @@
             document.getElementById('sifreDegistirYeniTekrar').value = '';
             document.getElementById('sifreDegistirUyari').innerHTML = '';
             openModal('sifreDegistirModal');
+        }
+
+        function openProfilSifreModal() {
+            if (!currentUser) { showToast('Oturum açmalısınız!', 'error'); return; }
+            document.getElementById('profilSifreUsername').value = currentUser.username;
+            document.getElementById('profilSifreMevcut').value = '';
+            document.getElementById('profilSifreYeni').value = '';
+            document.getElementById('profilSifreYeniTekrar').value = '';
+            document.getElementById('profilSifreUyari').innerHTML = '';
+            openModal('profilSifreModal');
+        }
+
+        function saveProfilSifre() {
+            if (!currentUser) { showToast('Oturum açmalısınız!', 'error'); return; }
+
+            const mevcut = document.getElementById('profilSifreMevcut').value;
+            const yeni = document.getElementById('profilSifreYeni').value;
+            const yeniTekrar = document.getElementById('profilSifreYeniTekrar').value;
+            const uyari = document.getElementById('profilSifreUyari');
+
+            if (!mevcut || !yeni || !yeniTekrar) {
+                uyari.innerHTML = '<div class="alert alert-danger"><i class="fas fa-exclamation-triangle"></i> Tüm alanları doldurun!</div>';
+                return;
+            }
+
+            const kullanicilar = DB.get('kullanicilar', []);
+            const user = kullanicilar.find(u => u.id === currentUser.id);
+
+            if (!user) {
+                uyari.innerHTML = '<div class="alert alert-danger"><i class="fas fa-exclamation-triangle"></i> Kullanıcı bulunamadı!</div>';
+                return;
+            }
+
+            if (user.password !== mevcut) {
+                uyari.innerHTML = '<div class="alert alert-danger"><i class="fas fa-exclamation-triangle"></i> Mevcut şifre hatalı!</div>';
+                return;
+            }
+
+            if (yeni.length < 3) {
+                uyari.innerHTML = '<div class="alert alert-danger"><i class="fas fa-exclamation-triangle"></i> Yeni şifre en az 3 karakter olmalı!</div>';
+                return;
+            }
+
+            if (yeni !== yeniTekrar) {
+                uyari.innerHTML = '<div class="alert alert-danger"><i class="fas fa-exclamation-triangle"></i> Yeni şifreler eşleşmiyor!</div>';
+                return;
+            }
+
+            user.password = yeni;
+            DB.set('kullanicilar', kullanicilar);
+
+            // currentUser'ı da güncelle
+            currentUser.password = yeni;
+
+            closeModal('profilSifreModal');
+            showToast('Şifreniz başarıyla değiştirildi!', 'success');
         }
 
         function saveSifreDegistir() {
