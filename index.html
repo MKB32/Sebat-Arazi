@@ -2207,10 +2207,12 @@
             // Bugünkü benzersiz gün sayısı (farklı işçilerin giriş yaptığı gün sayısı değil, toplam giriş kaydı)
             const bugunGunluk = girisler.filter(g => g.tarih === t && g.durum === 'giris_yapti' && !g.yasak).length;
 
+            const sahadaSimdi = girisler.filter(g => g.durum === 'giris_yapti' && !g.yasak).length;
             document.getElementById('statToplamCalisan').textContent = calisanlar.length;
-            document.getElementById('statAktifGiris').textContent = bugunGiris.length;
+            document.getElementById('statBugunCalisan').textContent = bugunGiris.length;
+            document.getElementById('statSahadaSimdi').textContent = sahadaSimdi;
             document.getElementById('statToplamKg').textContent = bugunKg.toFixed(2);
-            document.getElementById('statToplamGunluk').textContent = bugunGunluk;
+            document.getElementById('statToplamYevmiye').textContent = bugunGunluk;
 
             const tbody = document.getElementById('sonIslemlerTable');
             const son = [...girisler].sort((a,b) => new Date(b.zaman) - new Date(a.zaman)).slice(0, 10);
@@ -2230,7 +2232,7 @@
                 c.ad.toLowerCase().includes(arama) || c.soyad.toLowerCase().includes(arama) || c.tc_kimlik.includes(arama) || (c.barkod && c.barkod.includes(arama))
             );
             const tbody = document.getElementById('calisanlarTable');
-            if (calisanlar.length === 0) { tbody.innerHTML = '<tr><td colspan="7" class="text-center" style="padding:32px;color:var(--gray)">Kayıtlı işçi bulunmuyor</td></tr>'; return; }
+            if (calisanlar.length === 0) { tbody.innerHTML = '<tr><td colspan="6" class="text-center" style="padding:32px;color:var(--gray)">Kayıtlı işçi bulunmuyor</td></tr>'; return; }
             tbody.innerHTML = calisanlar.map(c => {
                 return '<tr><td><strong>' + c.ad + ' ' + c.soyad + '</strong></td><td>' + c.tc_kimlik + '</td><td><code style="background:var(--gray-light);padding:2px 6px;border-radius:4px;font-size:0.8rem;font-weight:700;">' + (c.barkod || '-') + '</code></td><td>' + c.yas + '</td><td><button class="btn btn-sm btn-secondary barkod-btn" data-id="' + c.id + '"><i class="fas fa-barcode"></i> Kart</button></td><td><div class="action-btns"><button class="btn btn-sm btn-secondary edit-calisan-btn" data-id="' + c.id + '"><i class="fas fa-edit"></i></button><button class="btn btn-sm btn-danger delete-calisan-btn" data-id="' + c.id + '"><i class="fas fa-trash"></i></button></div></td></tr>';
             }).join('');
@@ -2253,7 +2255,7 @@
             document.getElementById('calisanModalTitle').textContent = 'Yeni İşçi Ekle';
             document.getElementById('calisanUyari').innerHTML = '';
             document.getElementById('calisanYas').value = '';
-            document.getElementById('calisanKategori').value = '';
+            
             openModal('calisanModal');
         }
         function submitCalisanForm() {
@@ -2331,7 +2333,6 @@
             
             const card = document.createElement('div');
             card.className = 'barkod-card';
-            card.innerHTML = '<div class="barkod-header">SEBAT GÜLYAĞI - TARIM İŞLETMESİ</div><div class="barkod-isci">' + c.ad.toUpperCase() + ' ' + c.soyad.toUpperCase() + '</div><svg id="barkod-svg-' + c.id + '"></svg><div class="barkod-kod">' + c.barkod + '</div><div style="margin-top:4px;font-size:7pt;color:' + kat.renk + ';font-weight:700;">' + kat.label.toUpperCase() + '</div>';
             return card;
         }
         function printBarkodlar(mode) {
@@ -2557,7 +2558,7 @@
                     girisler.push(yeniGiris);
                     DB.set('girisler', girisler);
 
-                    showTerminalResult('success', 'TOPLAMA GİRİŞİ BAŞARILI', '<strong>' + calisan.ad + ' ' + calisan.soyad + '</strong><br>Kategori: <span style="color:' + kat.renk + '">' + kat.label + '</span><br>İş Türü: <span style="color:var(--terminal-success)">Toplama</span><br><span style="color:var(--terminal-warning)">Gün sonunda barkodu tekrar okutup KG miktarını giriniz.</span><br>Giriş Saati: ' + formatTime(yeniGiris.giris_tarihi));
+                    showTerminalResult('success', 'TOPLAMA GİRİŞİ BAŞARILI', '<strong>' + calisan.ad + ' ' + calisan.soyad + '</strong><br>İş Türü: <span style="color:var(--terminal-success)">Toplama</span><br><span style="color:var(--terminal-warning)">Gün sonunda barkodu tekrar okutup KG miktarını giriniz.</span><br>Giriş Saati: ' + formatTime(yeniGiris.giris_tarihi));
                     showToast('Toplama girişi kaydedildi. Gün sonunda KG giriniz.');
                 } else {
                     // NORMAL İŞ TÜRÜ (Toplama dışı)
@@ -2572,7 +2573,7 @@
                     girisler.push(yeniGiris);
                     DB.set('girisler', girisler);
 
-                    let resultBody = '<strong>' + calisan.ad + ' ' + calisan.soyad + '</strong><br>Kategori: <span style="color:' + kat.renk + '">' + kat.label + '</span><br>İş Türü: <span style="color:var(--terminal-success)">' + selectedIsTuru + '</span>';
+                    let resultBody = '<strong>' + calisan.ad + ' ' + calisan.soyad + '</strong><br>İş Türü: <span style="color:var(--terminal-success)">' + selectedIsTuru + '</span>';
                     resultBody += '<br>Yevmiye: <strong>' + ucret.toFixed(2) + ' ₺</strong>';
                     resultBody += '<br>Barkod: <code>' + calisan.barkod + '</code><br>Giriş Saati: ' + formatTime(yeniGiris.giris_tarihi);
 
@@ -2931,7 +2932,7 @@
             if (filterIsci) toplamalar = toplamalar.filter(t => t.calisan_id === filterIsci);
             toplamalar.sort((a,b) => new Date(b.zaman) - new Date(a.zaman));
             const tbody = document.getElementById('toplamalarTable');
-            if (toplamalar.length === 0) { tbody.innerHTML = '<tr><td colspan="7" class="text-center" style="padding:32px;color:var(--gray)">Kayıt bulunmuyor</td></tr>'; return; }
+            if (toplamalar.length === 0) { tbody.innerHTML = '<tr><td colspan="6" class="text-center" style="padding:32px;color:var(--gray)">Kayıt bulunmuyor</td></tr>'; return; }
             tbody.innerHTML = toplamalar.map(t => {
                 const c = calisanlar.find(x => x.id === t.calisan_id);
                 return '<tr><td>' + formatDate(t.tarih) + '</td><td><strong>' + (c ? c.ad+' '+c.soyad : 'Bilinmiyor') + '</strong></td><td><strong style="color:var(--primary);font-size:1rem;">' + t.kg.toFixed(2) + ' kg</strong></td><td>' + t.birim_fiyat.toFixed(2) + ' ₺/kg</td><td><strong>' + t.tutar.toFixed(2) + ' ₺</strong></td><td>' + (t.not || '-') + '</td><td><div class="action-btns"><button class="btn btn-sm btn-secondary edit-toplama-btn" data-id="' + t.id + '"><i class="fas fa-edit"></i></button><button class="btn btn-sm btn-danger delete-toplama-btn" data-id="' + t.id + '"><i class="fas fa-trash"></i></button></div></td></tr>';
@@ -3332,7 +3333,7 @@
 
                 return '<tr>' +
                     '<td><strong>' + c.ad + ' ' + c.soyad + '</strong> <code style="font-size:0.7rem;background:var(--gray-light);padding:1px 4px;border-radius:3px;">' + (c.barkod || '') + '</code></td>' +
-                    '<td><span class="badge ' + kat.badge + '">' + kat.label + '</span></td>' +
+                    '' +
                     '<td><div style="min-width:200px;">' + isTuruHtml + '</div></td>' +
                     '<td><strong>' + toplamGun + '</strong></td>' +
                     '<td><strong style="color:var(--primary);">' + toplamTutar.toFixed(2) + ' ₺</strong></td>' +
@@ -3824,7 +3825,7 @@
                     const diffSaat = Math.floor(diffMs / (1000 * 60 * 60));
                     const diffDakika = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
                     const isTuruBadge = g.is_turu ? '<span class="badge badge-purple">' + g.is_turu + '</span>' : '-';
-                    html += '<tr><td><strong>' + c.ad + ' ' + c.soyad + '</strong></td><td><code>' + (c.barkod || '-') + '</code></td><td>' + formatTime(g.giris_tarihi) + '</td><td>' + diffSaat + 's ' + diffDakika + 'dk</td><td>' + isTuruBadge + '</td><td><span class="badge ' + kat.badge + '">' + kat.label + '</span></td></tr>';
+                    html += '<tr><td><strong>' + c.ad + ' ' + c.soyad + '</strong></td><td><code>' + (c.barkod || '-') + '</code></td><td>' + formatTime(g.giris_tarihi) + '</td><td>' + diffSaat + 's ' + diffDakika + 'dk</td><td>' + isTuruBadge + '</td></tr>';
                 });
             }
             html += '</tbody></table></div></div></div>';
