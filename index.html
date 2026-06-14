@@ -791,16 +791,8 @@
                             <div><div class="stat-value" id="statToplamCalisan">0</div><div class="stat-label">Toplam İşçi</div></div>
                         </div>
                         <div class="stat-card">
-                            <div class="stat-icon yellow"><i class="fas fa-user-check"></i></div>
-                            <div><div class="stat-value" id="statYetiskin">0</div><div class="stat-label">Yetişkin İşçi</div></div>
-                        </div>
-                        <div class="stat-card">
                             <div class="stat-icon blue"><i class="fas fa-door-open"></i></div>
                             <div><div class="stat-value" id="statAktifGiris">0</div><div class="stat-label">Aktif Giriş (Bugün)</div></div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon red"><i class="fas fa-ban"></i></div>
-                            <div><div class="stat-value" id="statYasakGiris">0</div><div class="stat-label">Yasak Giriş Denemesi</div></div>
                         </div>
                         <div class="stat-card">
                             <div class="stat-icon purple"><i class="fas fa-weight-hanging"></i></div>
@@ -817,7 +809,7 @@
                         <div class="card-body">
                             <div class="table-container">
                                 <table>
-                                    <thead><tr><th>Tarih</th><th>İşçi</th><th>Arazi</th><th>İşlem</th><th>Durum</th></tr></thead>
+                                    <thead><tr><th>Tarih</th><th>İşçi</th><th>Arazi</th><th>İşlem</th></tr></thead>
                                     <tbody id="sonIslemlerTable"><tr><td colspan="5" class="text-center" style="padding:32px;color:var(--gray)">Henüz kayıt bulunmuyor</td></tr></tbody>
                                 </table>
                             </div>
@@ -841,7 +833,7 @@
                             </div>
                             <div class="table-container">
                                 <table>
-                                    <thead><tr><th>Ad Soyad</th><th>TC Kimlik</th><th>Barkod</th><th>Yaş</th><th>Kategori</th><th>Kimlik Kartı</th><th>İşlemler</th></tr></thead>
+                                    <thead><tr><th>Ad Soyad</th><th>TC Kimlik</th><th>Barkod</th><th>Yaş</th><th>Kimlik Kartı</th><th>İşlemler</th></tr></thead>
                                     <tbody id="calisanlarTable"></tbody>
                                 </table>
                             </div>
@@ -1074,7 +1066,7 @@
                                     <table>
                                         <thead>
                                             <tr>
-                                                <th>İşçi</th><th>Kategori</th><th>İş Türü Dağılımı</th>
+                                                <th>İşçi</th><th>İş Türü Dağılımı</th>
                                                 <th>Toplam Gün</th><th>Yevmiye Tutar</th>
                                                 <th>Toplama Tutar</th><th>Ara Ödeme</th><th>Net Ödenecek</th>
                                                 <th>Durum</th><th>İşlem</th>
@@ -1120,9 +1112,7 @@
                         <div class="card-body" style="padding: 24px;">
                             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; margin-bottom: 24px;">
                                 <button class="btn btn-secondary rapor-btn" data-rapor="genel" style="justify-content:center; padding: 24px; flex-direction: column; gap: 8px;"><i class="fas fa-users" style="font-size: 1.5rem;"></i> Genel İşçi Raporu</button>
-                                <button class="btn btn-secondary rapor-btn" data-rapor="genc" style="justify-content:center; padding: 24px; flex-direction: column; gap: 8px;"><i class="fas fa-child" style="font-size: 1.5rem;"></i> Genç İşçi Listesi</button>
                                 <button class="btn btn-secondary rapor-btn" data-rapor="arazi" style="justify-content:center; padding: 24px; flex-direction: column; gap: 8px;"><i class="fas fa-map-marked-alt" style="font-size: 1.5rem;"></i> Arazi Bazlı Rapor</button>
-                                <button class="btn btn-secondary rapor-btn" data-rapor="yasak" style="justify-content:center; padding: 24px; flex-direction: column; gap: 8px;"><i class="fas fa-ban" style="font-size: 1.5rem;"></i> Yasak Giriş Logları</button>
                                 <button class="btn btn-secondary rapor-btn" data-rapor="gunluk" style="justify-content:center; padding: 24px; flex-direction: column; gap: 8px;"><i class="fas fa-calendar-day" style="font-size: 1.5rem;"></i> Günlük Giriş/Çıkış Raporu</button>
                                 <button class="btn btn-secondary rapor-btn" data-rapor="aktif" style="justify-content:center; padding: 24px; flex-direction: column; gap: 8px;"><i class="fas fa-walking" style="font-size: 1.5rem;"></i> Şu An Sahada Olanlar</button>
                                 <button class="btn btn-secondary rapor-btn" data-rapor="isturu" style="justify-content:center; padding: 24px; flex-direction: column; gap: 8px;"><i class="fas fa-tools" style="font-size: 1.5rem;"></i> İş Türüne Göre Çalışma</button>
@@ -1201,7 +1191,6 @@
                         <div class="form-group"><label class="form-label">Soyad *</label><input type="text" class="form-input" id="calisanSoyad" required placeholder="Soyisim girin"></div>
                         <div class="form-group"><label class="form-label">Doğum Tarihi *</label><input type="date" class="form-input" id="calisanDogum" required></div>
                         <div class="form-group"><label class="form-label">Yaş (Otomatik)</label><input type="number" class="form-input" id="calisanYas" readonly style="background: var(--gray-light);"></div>
-                        <div class="form-group"><label class="form-label">Kategori (Otomatik)</label><input type="text" class="form-input" id="calisanKategori" readonly style="background: var(--gray-light); font-weight: 600;"></div>
                         <div class="form-group"><label class="form-label">Telefon</label><input type="tel" class="form-input" id="calisanTelefon" placeholder="05XX XXX XX XX"></div>
                         <div class="form-group" style="grid-column: 1 / -1;"><label class="form-label">Adres</label><textarea class="form-input" id="calisanAdres" rows="2" placeholder="Adres bilgisi..."></textarea></div>
                     </div>
@@ -1955,10 +1944,7 @@
             if (m < 0 || (m === 0 && n.getDate() < d.getDate())) yas--;
             return yas;
         }
-        function kategoriBelirle(yas) {
-            if (yas < 18) return { kategori: 'yasak', label: 'YASAK', badge: 'badge-red', renk: 'var(--danger)', cls: 'yasak' };
-            return { kategori: 'yetiskin', label: 'Yetişkin', badge: 'badge-green', renk: 'var(--primary)', cls: 'yetiskin' };
-        }
+        
 
         // ===================== EVENT BINDINGS =====================
         function initEventListeners() {
@@ -2070,9 +2056,7 @@
                     const rapor = this.dataset.rapor;
                     switch(rapor) {
                         case 'genel': raporGenel(); break;
-                        case 'genc': raporGencIsci(); break;
                         case 'arazi': raporArazi(); break;
-                        case 'yasak': raporYasak(); break;
                         case 'gunluk': raporGunlukGiris(); break;
                         case 'aktif': raporAktifSahada(); break;
                         case 'isturu': raporIsTuru(); break;
@@ -2177,7 +2161,6 @@
             const toplamalar = DB.get('toplamalar', []);
             const t = todayStr();
             const bugunGiris = girisler.filter(g => g.tarih === t && g.durum === 'giris_yapti');
-            const yasakDeneme = girisler.filter(g => g.tarih === t && g.yasak === true);
             
             const bugunKg = toplamalar.filter(x => x.tarih === t).reduce((s, x) => s + (parseFloat(x.kg) || 0), 0);
 
@@ -2185,9 +2168,7 @@
             const bugunGunluk = girisler.filter(g => g.tarih === t && g.durum === 'giris_yapti' && !g.yasak).length;
 
             document.getElementById('statToplamCalisan').textContent = calisanlar.length;
-            document.getElementById('statYetiskin').textContent = calisanlar.filter(c => c.kategori === 'yetiskin').length;
             document.getElementById('statAktifGiris').textContent = bugunGiris.length;
-            document.getElementById('statYasakGiris').textContent = yasakDeneme.length;
             document.getElementById('statToplamKg').textContent = bugunKg.toFixed(2);
             document.getElementById('statToplamGunluk').textContent = bugunGunluk;
 
@@ -2197,8 +2178,8 @@
             tbody.innerHTML = son.map(g => {
                 const c = calisanlar.find(x => x.id === g.calisan_id);
                 const a = DB.get('araziler', []).find(x => x.id === g.arazi_id);
-                const durum = g.yasak ? '<span class="badge badge-red">YASAK GİRİŞ</span>' : g.durum === 'giris_yapti' ? '<span class="badge badge-green">Giriş</span>' : '<span class="badge badge-gray">Çıkış</span>';
-                return '<tr><td>' + formatDateTime(g.zaman) + '</td><td>' + (c ? c.ad+' '+c.soyad : 'Bilinmiyor') + '</td><td>' + (a ? a.arazi_adi : '-') + '</td><td>' + (g.durum === 'giris_yapti' ? 'Giriş' : 'Çıkış') + '</td><td>' + durum + '</td></tr>';
+                
+                return '<tr><td>' + formatDateTime(g.zaman) + '</td><td>' + (c ? c.ad+' '+c.soyad : 'Bilinmiyor') + '</td><td>' + (a ? a.arazi_adi : '-') + '</td><td>' + (g.durum === 'giris_yapti' ? 'Giriş' : 'Çıkış') + '</td></tr>';
             }).join('');
         }
 
@@ -2211,8 +2192,7 @@
             const tbody = document.getElementById('calisanlarTable');
             if (calisanlar.length === 0) { tbody.innerHTML = '<tr><td colspan="7" class="text-center" style="padding:32px;color:var(--gray)">Kayıtlı işçi bulunmuyor</td></tr>'; return; }
             tbody.innerHTML = calisanlar.map(c => {
-                const kat = kategoriBelirle(c.yas);
-                return '<tr><td><strong>' + c.ad + ' ' + c.soyad + '</strong></td><td>' + c.tc_kimlik + '</td><td><code style="background:var(--gray-light);padding:2px 6px;border-radius:4px;font-size:0.8rem;font-weight:700;">' + (c.barkod || '-') + '</code></td><td>' + c.yas + '</td><td><span class="badge ' + kat.badge + '">' + kat.label + '</span></td><td><button class="btn btn-sm btn-secondary barkod-btn" data-id="' + c.id + '"><i class="fas fa-barcode"></i> Kart</button></td><td><div class="action-btns"><button class="btn btn-sm btn-secondary edit-calisan-btn" data-id="' + c.id + '"><i class="fas fa-edit"></i></button><button class="btn btn-sm btn-danger delete-calisan-btn" data-id="' + c.id + '"><i class="fas fa-trash"></i></button></div></td></tr>';
+                return '<tr><td><strong>' + c.ad + ' ' + c.soyad + '</strong></td><td>' + c.tc_kimlik + '</td><td><code style="background:var(--gray-light);padding:2px 6px;border-radius:4px;font-size:0.8rem;font-weight:700;">' + (c.barkod || '-') + '</code></td><td>' + c.yas + '</td><td><button class="btn btn-sm btn-secondary barkod-btn" data-id="' + c.id + '"><i class="fas fa-barcode"></i> Kart</button></td><td><div class="action-btns"><button class="btn btn-sm btn-secondary edit-calisan-btn" data-id="' + c.id + '"><i class="fas fa-edit"></i></button><button class="btn btn-sm btn-danger delete-calisan-btn" data-id="' + c.id + '"><i class="fas fa-trash"></i></button></div></td></tr>';
             }).join('');
 
             // Bind events for dynamic buttons
@@ -2245,13 +2225,10 @@
             const d = document.getElementById('calisanDogum').value;
             if (!d) return;
             const yas = hesaplaYas(d);
-            const kat = kategoriBelirle(yas);
             document.getElementById('calisanYas').value = yas;
-            document.getElementById('calisanKategori').value = kat.label;
-            document.getElementById('calisanKategori').style.color = kat.renk;
             const u = document.getElementById('calisanUyari');
-            if (kat.kategori === 'yasak') {
-                u.innerHTML = '<div class="alert alert-danger"><i class="fas fa-ban"></i> <strong>UYARI:</strong> 18 yaş altı işçiler sistemde kaydedilemez ve araziye giremez!</div>';
+            if (yas < 18) {
+                u.innerHTML = '<div class="alert alert-danger"><i class="fas fa-ban"></i> <strong>UYARI:</strong> 18 yaş altı işçiler sistemde kaydedilemez!</div>';
             } else { u.innerHTML = ''; }
         }
         function saveCalisan() {
@@ -2261,14 +2238,13 @@
             const soyad = document.getElementById('calisanSoyad').value.trim();
             const dogum = document.getElementById('calisanDogum').value;
             const yas = hesaplaYas(dogum);
-            const kat = kategoriBelirle(yas);
-            if (kat.kategori === 'yasak') { showToast('18 yaş altı işçi kaydedilemez ve araziye giremez!', 'error'); return; }
+            if (yas < 18) { showToast('18 yaş altı işçi kaydedilemez!', 'error'); return; }
             const calisanlar = DB.get('calisanlar', []);
             const mevcut = calisanlar.findIndex(c => c.tc_kimlik === tc && c.id !== id);
             if (mevcut >= 0) { showToast('Bu TC kimlik numarası zaten kayıtlı!', 'error'); return; }
             const isNew = !document.getElementById('calisanId').value;
             const barkod = isNew ? generateBarkod() : (calisanlar.find(c => c.id === id)?.barkod || generateBarkod());
-            const data = { id, tc_kimlik: tc, ad, soyad, dogum, yas, kategori: kat.kategori, barkod, telefon: document.getElementById('calisanTelefon').value, adres: document.getElementById('calisanAdres').value, aktif: true, olusturma_tarihi: new Date().toISOString() };
+            const data = { id, tc_kimlik: tc, ad, soyad, dogum, yas, barkod, telefon: document.getElementById('calisanTelefon').value, adres: document.getElementById('calisanAdres').value, aktif: true, olusturma_tarihi: new Date().toISOString() };
             const idx = calisanlar.findIndex(c => c.id === id);
             if (idx >= 0) calisanlar[idx] = data; else calisanlar.push(data);
             DB.set('calisanlar', calisanlar);
@@ -2312,7 +2288,7 @@
             openModal('barkodModal');
         }
         function createBarkodCard(c) {
-            const kat = kategoriBelirle(c.yas);
+            
             const card = document.createElement('div');
             card.className = 'barkod-card';
             card.innerHTML = '<div class="barkod-header">SEBAT GÜLYAĞI - TARIM İŞLETMESİ</div><div class="barkod-isci">' + c.ad.toUpperCase() + ' ' + c.soyad.toUpperCase() + '</div><svg id="barkod-svg-' + c.id + '"></svg><div class="barkod-kod">' + c.barkod + '</div><div style="margin-top:4px;font-size:7pt;color:' + kat.renk + ';font-weight:700;">' + kat.label.toUpperCase() + '</div>';
@@ -2459,13 +2435,7 @@
                 showTerminalResult('error', 'Barkod Bulunamadı', 'Girilen barkod numarası sistemde kayıtlı değil: <strong>' + barkod + '</strong><br>Lütfen barkodu kontrol edin.');
                 showToast('Barkod bulunamadı!', 'error'); return;
             }
-            const kat = kategoriBelirle(calisan.yas);
-            if (calisan.kategori === 'yasak') {
-                logYasakGiris(calisan.id);
-                showTerminalResult('error', 'GİRİŞ ENGELLENDİ!', '<strong>' + calisan.ad + ' ' + calisan.soyad + '</strong><br>Yaş: ' + calisan.yas + ' (18 yaş altı)<br><span style="color:var(--terminal-danger)">Bu kişinin araziye girişi yasaktır!</span>');
-                showToast('YASAK GİRİŞ! 18 yaş altı işçi!', 'error');
-                updateTerminalBadge(); renderTerminalKayitlar(); return;
-            }
+            /* Tüm işçiler 18+ olduğu için yaş kontrolü kaldırıldı */
 
             const t = todayStr();
             const girisler = DB.get('girisler', []);
@@ -2541,7 +2511,7 @@
                         id: uuid(), calisan_id: calisan.id, arazi_id: araziId, 
                         giris_tarihi: new Date().toISOString(), cikis_tarihi: null, 
                         durum: 'giris_yapti', yevmiye_tutar: 0, is_turu: 'Toplama', 
-                        tarih: t, zaman: new Date().toISOString(), yasak: false,
+                        tarih: t, zaman: new Date().toISOString(),
                         kg: 0, toplama_tutar: 0
                     };
                     girisler.push(yeniGiris);
@@ -2556,7 +2526,7 @@
                         id: uuid(), calisan_id: calisan.id, arazi_id: araziId, 
                         giris_tarihi: new Date().toISOString(), cikis_tarihi: null, 
                         durum: 'giris_yapti', yevmiye_tutar: ucret, is_turu: selectedIsTuru, 
-                        tarih: t, zaman: new Date().toISOString(), yasak: false,
+                        tarih: t, zaman: new Date().toISOString(),
                         kg: 0, toplama_tutar: 0
                     };
                     girisler.push(yeniGiris);
@@ -2592,8 +2562,7 @@
                 const c = calisanlar.find(x => x.id === g.calisan_id);
                 if (!c) return '';
                 let statusClass = 'cikis', statusText = 'Çıkış';
-                if (g.yasak) { statusClass = 'yasak'; statusText = 'Yasak'; }
-                else if (g.durum === 'giris_yapti') { statusClass = 'giris'; statusText = 'Giriş'; }
+                if (g.durum === 'giris_yapti') { statusClass = 'giris'; statusText = 'Giriş'; }
                 const isTuruBadge = g.is_turu ? '<span style="color:var(--terminal-muted);font-size:0.75rem;">' + g.is_turu + '</span>' : '';
                 let kgInfo = '';
                 if (g.is_turu === 'Toplama') {
@@ -2633,11 +2602,7 @@
             showToast('Kayıt silindi.');
         }
 
-        function logYasakGiris(calisanId) {
-            const girisler = DB.get('girisler', []);
-            girisler.push({ id: uuid(), calisan_id: calisanId, arazi_id: null, giris_tarihi: new Date().toISOString(), durum: 'yasak', tarih: todayStr(), zaman: new Date().toISOString(), yasak: true });
-            DB.set('girisler', girisler);
-        }
+        
 
         
         // ===================== SAHADA İŞÇİ KONTROLÜ =====================
@@ -2750,7 +2715,6 @@
                 return;
             }
 
-            const kat = kategoriBelirle(calisan.yas);
             const girisler = DB.get('girisler', []);
             const t = todayStr();
             const bugunGiris = girisler.filter(g => g.calisan_id === calisan.id && g.tarih === t && g.durum === 'giris_yapti' && !g.yasak);
@@ -2758,10 +2722,7 @@
 
             let durumHtml = '';
             let durumClass = 'basarili';
-            if (calisan.kategori === 'yasak') {
-                durumHtml = '<span class="badge badge-red" style="font-size:1rem;padding:6px 16px;"><i class="fas fa-ban"></i> YASAK - 18 Yaş Altı</span>';
-                durumClass = 'yasak';
-            } else if (sahada) {
+            if (sahada) {
                 durumHtml = '<span class="badge badge-green" style="font-size:1rem;padding:6px 16px;"><i class="fas fa-check-circle"></i> SAHADA</span>';
             } else {
                 durumHtml = '<span class="badge badge-gray" style="font-size:1rem;padding:6px 16px;"><i class="fas fa-sign-out-alt"></i> SAHADA DEĞİL</span>';
@@ -2774,7 +2735,7 @@
                 '<div style="text-align:center;margin-bottom:16px;">' + durumHtml + '</div>' +
                 '<div class="kontrol-detay">' +
                 '<div class="kontrol-detay-item"><div class="kontrol-detay-label"><i class="fas fa-birthday-cake"></i> Yaş</div><div class="kontrol-detay-value">' + calisan.yas + '</div></div>' +
-                '<div class="kontrol-detay-item"><div class="kontrol-detay-label"><i class="fas fa-tag"></i> Kategori</div><div class="kontrol-detay-value" style="color:' + kat.renk + '">' + kat.label + '</div></div>' +
+                
                 '<div class="kontrol-detay-item"><div class="kontrol-detay-label"><i class="fas fa-barcode"></i> Barkod</div><div class="kontrol-detay-value" style="font-family:monospace;letter-spacing:2px;font-size:0.9rem;">' + calisan.barkod + '</div></div>' +
                 '<div class="kontrol-detay-item"><div class="kontrol-detay-label"><i class="fas fa-id-card"></i> TC Kimlik</div><div class="kontrol-detay-value" style="font-family:monospace;letter-spacing:1px;font-size:0.85rem;">' + calisan.tc_kimlik + '</div></div>' +
                 '</div>' +
@@ -2782,11 +2743,7 @@
 
             card.style.display = 'block';
 
-            if (calisan.kategori === 'yasak') {
-                showToast('UYARI: 18 yaş altı işçi!', 'error');
-            } else {
-                showToast('İşçi bilgileri: ' + calisan.ad + ' ' + calisan.soyad, 'success');
-            }
+            showToast('İşçi bilgileri: ' + calisan.ad + ' ' + calisan.soyad, 'success');
         }
 
         // İş Terminali Kamera Fonksiyonları
@@ -3275,7 +3232,7 @@
 
                 const odeme = odemeler.find(o => o.calisan_id === c.id && o.donem === donem);
                 const durum = odeme ? odeme.durum : 'beklemede';
-                const kat = kategoriBelirle(c.yas);
+                
 
                 return '<tr>' +
                     '<td><strong>' + c.ad + ' ' + c.soyad + '</strong> <code style="font-size:0.7rem;background:var(--gray-light);padding:1px 4px;border-radius:3px;">' + (c.barkod || '') + '</code></td>' +
@@ -3635,24 +3592,17 @@
         function raporGenel() {
             const calisanlar = DB.get('calisanlar', []);
             const girisler = DB.get('girisler', []);
-            let html = '<div class="card rapor-print"><div class="card-header" style="display:flex;justify-content:space-between;align-items:center;"><div class="card-title">Genel İşçi Raporu</div><button class="btn btn-sm btn-secondary no-print" onclick="window.print()"><i class="fas fa-print"></i> Yazdır</button></div><div class="card-body"><div class="table-container"><table><thead><tr><th>İşçi</th><th>TC</th><th>Barkod</th><th>Yaş</th><th>Kategori</th><th>Toplam Gün</th><th>Son Giriş Tarihi</th></tr></thead><tbody>';
+            let html = '<div class="card rapor-print"><div class="card-header" style="display:flex;justify-content:space-between;align-items:center;"><div class="card-title">Genel İşçi Raporu</div><button class="btn btn-sm btn-secondary no-print" onclick="window.print()"><i class="fas fa-print"></i> Yazdır</button></div><div class="card-body"><div class="table-container"><table><thead><tr><th>İşçi</th><th>TC</th><th>Barkod</th><th>Yaş</th><th>Toplam Gün</th><th>Son Giriş Tarihi</th></tr></thead><tbody>';
             calisanlar.forEach(c => {
                 const gunluk = {}; girisler.filter(x => x.calisan_id === c.id && x.durum !== 'yasak').forEach(g => { gunluk[g.tarih] = true; });
                 const toplamGun = Object.keys(gunluk).length;
                 const sonGiris = girisler.filter(x => x.calisan_id === c.id && x.durum !== 'yasak').sort((a,b) => new Date(b.zaman) - new Date(a.zaman))[0];
-                const kat = kategoriBelirle(c.yas);
-                html += '<tr><td>' + c.ad + ' ' + c.soyad + '</td><td>' + c.tc_kimlik + '</td><td><code>' + (c.barkod || '-') + '</code></td><td>' + c.yas + '</td><td><span class="badge ' + kat.badge + '">' + kat.label + '</span></td><td>' + toplamGun + '</td><td>' + (sonGiris ? formatDateTime(sonGiris.zaman) : '-') + '</td></tr>';
+                html += '<tr><td>' + c.ad + ' ' + c.soyad + '</td><td>' + c.tc_kimlik + '</td><td><code>' + (c.barkod || '-') + '</code></td><td>' + c.yas + '</td><td>' + toplamGun + '</td><td>' + (sonGiris ? formatDateTime(sonGiris.zaman) : '-') + '</td></tr>';
             });
             html += '</tbody></table></div></div></div>';
             document.getElementById('raporContent').innerHTML = html;
         }
-        function raporGencIsci() {
-            const calisanlar = DB.get('calisanlar', []).filter(c => c.kategori === 'yasak');
-            let html = '<div class="card rapor-print"><div class="card-header" style="display:flex;justify-content:space-between;align-items:center;"><div class="card-title">Yasak Giriş Denemesi Yapanlar (18 Yaş Altı)</div><button class="btn btn-sm btn-secondary no-print" onclick="window.print()"><i class="fas fa-print"></i> Yazdır</button></div><div class="card-body"><div class="table-container"><table><thead><tr><th>Ad Soyad</th><th>Barkod</th><th>TC</th><th>Yaş</th><th>Telefon</th></tr></thead><tbody>';
-            calisanlar.forEach(c => { html += '<tr><td>' + c.ad + ' ' + c.soyad + '</td><td><code>' + (c.barkod || '-') + '</code></td><td>' + c.tc_kimlik + '</td><td>' + c.yas + '</td><td>' + (c.telefon || '-') + '</td></tr>'; });
-            html += '</tbody></table></div></div></div>';
-            document.getElementById('raporContent').innerHTML = html;
-        }
+        
         function raporArazi() {
             const araziler = DB.get('araziler', []);
             const girisler = DB.get('girisler', []);
@@ -3666,14 +3616,7 @@
             html += '</div></div>';
             document.getElementById('raporContent').innerHTML = html;
         }
-        function raporYasak() {
-            const girisler = DB.get('girisler', []).filter(g => g.yasak === true);
-            const calisanlar = DB.get('calisanlar', []);
-            let html = '<div class="card rapor-print"><div class="card-header" style="display:flex;justify-content:space-between;align-items:center;"><div class="card-title">Yasak Giriş Denemeleri</div><button class="btn btn-sm btn-secondary no-print" onclick="window.print()"><i class="fas fa-print"></i> Yazdır</button></div><div class="card-body"><div class="table-container"><table><thead><tr><th>Tarih</th><th>İşçi</th><th>Barkod</th><th>Yaş</th><th>Durum</th></tr></thead><tbody>';
-            girisler.forEach(g => { const c = calisanlar.find(x => x.id === g.calisan_id); html += '<tr><td>' + formatDateTime(g.zaman) + '</td><td>' + (c ? c.ad+' '+c.soyad : 'Bilinmiyor') + '</td><td><code>' + (c ? c.barkod || '-' : '-') + '</code></td><td>' + (c ? c.yas : '-') + '</td><td><span class="badge badge-red">ENGELLENDİ</span></td></tr>'; });
-            html += '</tbody></table></div></div></div>';
-            document.getElementById('raporContent').innerHTML = html;
-        }
+        
         function raporGunlukGiris() {
             let html = '<div class="card rapor-print">';
             html += '<div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">';
@@ -3698,15 +3641,14 @@
             let content = '';
             if (girisler.length === 0) { content = '<div style="padding:32px;text-align:center;color:var(--gray)">Bu tarih için kayıt bulunmuyor</div>'; }
             else {
-                content = '<div class="table-container"><table><thead><tr><th>Saat</th><th>İşçi</th><th>Barkod</th><th>İşlem</th><th>İş Türü</th><th>Durum</th><th>Kategori</th></tr></thead><tbody>';
+                content = '<div class="table-container"><table><thead><tr><th>Saat</th><th>İşçi</th><th>Barkod</th><th>İşlem</th><th>İş Türü</th><th>Durum</th></tr></thead><tbody>';
                 girisler.forEach(g => {
                     const c = calisanlar.find(x => x.id === g.calisan_id);
                     if (!c) return;
-                    const kat = kategoriBelirle(c.yas);
-                    const islem = g.yasak ? '<span class="badge badge-red">YASAK</span>' : g.durum === 'giris_yapti' ? '<span class="badge badge-green">Giriş</span>' : '<span class="badge badge-gray">Çıkış</span>';
-                    const durum = g.durum === 'giris_yapti' && !g.yasak ? '<span class="badge badge-blue">Sahada</span>' : (g.yasak ? '<span class="badge badge-red">Engellendi</span>' : '<span class="badge badge-gray">Çıktı</span>');
+                    const islem = g.durum === 'giris_yapti' ? '<span class="badge badge-green">Giriş</span>' : '<span class="badge badge-gray">Çıkış</span>';
+                    const durum = g.durum === 'giris_yapti' ? '<span class="badge badge-blue">Sahada</span>' : '<span class="badge badge-gray">Çıktı</span>';
                     const isTuruBadge = g.is_turu ? '<span class="badge badge-purple">' + g.is_turu + '</span>' : '-';
-                    content += '<tr><td>' + formatTime(g.zaman) + '</td><td><strong>' + c.ad + ' ' + c.soyad + '</strong></td><td><code>' + (c.barkod || '-') + '</code></td><td>' + islem + '</td><td>' + isTuruBadge + '</td><td>' + durum + '</td><td><span class="badge ' + kat.badge + '">' + kat.label + '</span></td></tr>';
+                    content += '<tr><td>' + formatTime(g.zaman) + '</td><td><strong>' + c.ad + ' ' + c.soyad + '</strong></td><td><code>' + (c.barkod || '-') + '</code></td><td>' + islem + '</td><td>' + isTuruBadge + '</td><td>' + durum + '</td></tr>';
                 });
                 content += '</tbody></table></div>';
             }
@@ -3715,13 +3657,13 @@
         function raporAktifSahada() {
             const girisler = DB.get('girisler', []).filter(g => g.durum === 'giris_yapti' && !g.yasak);
             const calisanlar = DB.get('calisanlar', []);
-            let html = '<div class="card rapor-print"><div class="card-header" style="display:flex;justify-content:space-between;align-items:center;"><div class="card-title">Şu An Sahada Olanlar <span class="badge badge-blue">' + girisler.length + ' kişi</span></div><button class="btn btn-sm btn-secondary no-print" onclick="window.print()"><i class="fas fa-print"></i> Yazdır</button></div><div class="card-body"><div class="table-container"><table><thead><tr><th>İşçi</th><th>Barkod</th><th>Giriş Saati</th><th>Çalışma Süresi</th><th>İş Türü</th><th>Kategori</th></tr></thead><tbody>';
+            let html = '<div class="card rapor-print"><div class="card-header" style="display:flex;justify-content:space-between;align-items:center;"><div class="card-title">Şu An Sahada Olanlar <span class="badge badge-blue">' + girisler.length + ' kişi</span></div><button class="btn btn-sm btn-secondary no-print" onclick="window.print()"><i class="fas fa-print"></i> Yazdır</button></div><div class="card-body"><div class="table-container"><table><thead><tr><th>İşçi</th><th>Barkod</th><th>Giriş Saati</th><th>Çalışma Süresi</th><th>İş Türü</th></tr></thead><tbody>';
             if (girisler.length === 0) { html += '<tr><td colspan="6" class="text-center" style="padding:32px;color:var(--gray)">Şu an sahada kimse yok</td></tr>'; }
             else {
                 girisler.forEach(g => {
                     const c = calisanlar.find(x => x.id === g.calisan_id);
                     if (!c) return;
-                    const kat = kategoriBelirle(c.yas);
+                    
                     const girisZamani = new Date(g.giris_tarihi);
                     const simdi = new Date();
                     const diffMs = simdi - girisZamani;
