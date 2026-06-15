@@ -728,52 +728,50 @@
         @media print {
             @page {
                 size: A4 landscape;
-                margin: 8mm;
+                margin: 0;
             }
 
-            /* Sadece body'nin doğrudan çocuklarını gizle */
-            body > *:not(#barkodPrintArea) {
-                display: none !important;
-            }
-
-            /* Barkod yazdırma alanını göster ve tam ekran yap */
-            #barkodPrintArea {
-                display: block !important;
-                position: fixed !important;
-                top: 0 !important;
-                left: 0 !important;
-                width: 100% !important;
-                height: 100% !important;
+            body {
                 margin: 0 !important;
                 padding: 0 !important;
                 background: white !important;
-                z-index: 99999 !important;
-                visibility: visible !important;
             }
 
-            #barkodPrintArea * {
-                visibility: visible !important;
+            /* Her sayfa - A4 yatay boyutlarında */
+            .barkod-print-page {
+                width: 297mm !important;
+                height: 210mm !important;
+                box-sizing: border-box !important;
+                padding: 8mm !important;
+                page-break-after: always !important;
+                break-after: page !important;
+                display: block !important;
+                position: relative !important;
+                overflow: hidden !important;
+                background: white !important;
             }
 
-            /* Barkod yazdırma grid'i - A4 YATAY: 4 sütun x 2 satır = 8 kart/sayfa */
+            /* Son sayfa için page-break kaldır */
+            .barkod-print-page:last-of-type {
+                page-break-after: auto !important;
+                break-after: auto !important;
+            }
+
+            /* Barkod grid - 4 sütun x 2 satır */
             .barkod-print-grid {
                 display: grid !important;
                 grid-template-columns: repeat(4, 1fr) !important;
                 grid-template-rows: repeat(2, 1fr) !important;
-                gap: 6mm 6mm !important;
+                gap: 5mm 5mm !important;
                 width: 100% !important;
                 height: 100% !important;
-                padding: 4mm !important;
                 box-sizing: border-box !important;
-                align-content: stretch !important;
-                justify-content: stretch !important;
             }
 
             /* Her barkod kartı */
             .barkod-print-card {
                 width: 100% !important;
                 height: 100% !important;
-                min-height: 0 !important;
                 background: white !important;
                 border: 1.5px solid #000 !important;
                 padding: 3mm !important;
@@ -788,31 +786,30 @@
             }
 
             .barkod-print-card .barkod-print-header {
-                font-size: 6.5pt !important;
+                font-size: 7pt !important;
                 font-weight: 700 !important;
                 color: #1a5d3a !important;
-                margin-bottom: 1.5mm !important;
+                margin-bottom: 1mm !important;
                 text-align: center !important;
-                line-height: 1.15 !important;
+                line-height: 1.1 !important;
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
-                white-space: nowrap !important;
             }
 
             .barkod-print-card .barkod-print-isci {
                 font-size: 8pt !important;
                 font-weight: 700 !important;
                 color: #000 !important;
-                margin-bottom: 1.5mm !important;
+                margin-bottom: 1mm !important;
                 text-align: center !important;
-                line-height: 1.15 !important;
+                line-height: 1.1 !important;
                 word-break: break-word !important;
                 max-width: 100% !important;
             }
 
             .barkod-print-card svg {
                 max-width: 95% !important;
-                max-height: 22mm !important;
+                max-height: 20mm !important;
                 height: auto !important;
                 width: auto !important;
             }
@@ -825,14 +822,6 @@
                 margin-top: 0.5mm !important;
                 color: #000 !important;
                 text-align: center !important;
-            }
-
-            /* Sayfa sonu kontrolü */
-            .barkod-page-break {
-                page-break-after: always !important;
-                break-after: page !important;
-                height: 0 !important;
-                overflow: hidden !important;
             }
 
             /* Rapor yazdırma stilleri */
@@ -2499,77 +2488,99 @@
             card.innerHTML = '<div class="barkod-print-header">SEBAT GÜLYAĞI - TARIM İŞLETMESİ</div><div class="barkod-print-isci">' + c.ad.toUpperCase() + ' ' + c.soyad.toUpperCase() + '</div><svg id="barkod-print-svg-' + c.id + '"></svg><div class="barkod-print-kod">' + c.barkod + '</div>';
             return card;
         }
-        function printBarkodlar(mode) {
-            const calisanlar = DB.get('calisanlar', []).filter(c => c.aktif);
-            const printArea = document.getElementById('barkodPrintArea');
+        // HTML escape helper
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
 
-            // Önce tüm rapor-print class'larını kaldır (barkod yazdırırken çakışmasın)
-            document.querySelectorAll('.rapor-print').forEach(el => el.classList.remove('rapor-print'));
+function printBarkodlar(mode) {
+    const calisanlar = DB.get('calisanlar', []).filter(c => c.aktif);
 
-            printArea.classList.remove('hidden');
-            printArea.innerHTML = '';
+    // Hangi işçiler yazdırılacak?
+    let yazdirilacakCalisanlar = [];
+    if (mode === 'tekli') {
+        const c = calisanlar.find(x => x.id === currentBarkodCalisanId);
+        if (!c) { showToast('İşçi bulunamadı!', 'error'); return; }
+        yazdirilacakCalisanlar = [c];
+    } else if (mode === 'hepsi') {
+        yazdirilacakCalisanlar = calisanlar;
+    }
 
-            // Hangi işçiler yazdırılacak?
-            let yazdirilacakCalisanlar = [];
-            if (mode === 'tekli') {
-                const c = calisanlar.find(x => x.id === currentBarkodCalisanId);
-                if (!c) { showToast('İşçi bulunamadı!', 'error'); return; }
-                yazdirilacakCalisanlar = [c];
-            } else if (mode === 'hepsi') {
-                yazdirilacakCalisanlar = calisanlar;
-            }
+    if (yazdirilacakCalisanlar.length === 0) {
+        showToast('Yazdırılacak işçi bulunamadı!', 'warning');
+        return;
+    }
 
-            // Her sayfaya 8 kart (4 sütun x 2 satır) sığar - A4 YATAY
-            const KART_SAYISI_SAYFA = 8;
-            const toplamKart = yazdirilacakCalisanlar.length;
-            const sayfaSayisi = Math.ceil(toplamKart / KART_SAYISI_SAYFA);
+    // Her sayfaya 8 kart (4 sütun x 2 satır) - A4 YATAY
+    const KART_SAYISI_SAYFA = 8;
+    const toplamKart = yazdirilacakCalisanlar.length;
+    const sayfaSayisi = Math.ceil(toplamKart / KART_SAYISI_SAYFA);
 
-            for (let sayfa = 0; sayfa < sayfaSayisi; sayfa++) {
-                const grid = document.createElement('div');
-                grid.className = 'barkod-print-grid';
+    // Yeni pencerede yazdır - body değiştirme sorununu çözer
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+        showToast('Yazdırma penceresi açılamadı! Pop-up engelleyiciyi kontrol edin.', 'error');
+        return;
+    }
 
-                const baslangic = sayfa * KART_SAYISI_SAYFA;
-                const bitis = Math.min(baslangic + KART_SAYISI_SAYFA, toplamKart);
+    // HTML oluştur
+    let html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Barkod Kimlik Kartları</title>';
+    html += '<style>';
+    html += '@page { size: A4 landscape; margin: 0; }';
+    html += 'body { margin: 0 !important; padding: 0 !important; background: white !important; font-family: "Inter", Arial, sans-serif; }';
+    html += '.barkod-print-page { width: 297mm !important; height: 210mm !important; box-sizing: border-box !important; padding: 8mm !important; page-break-after: always !important; break-after: page !important; display: block !important; position: relative !important; overflow: hidden !important; background: white !important; }';
+    html += '.barkod-print-page:last-of-type { page-break-after: auto !important; break-after: auto !important; }';
+    html += '.barkod-print-grid { display: grid !important; grid-template-columns: repeat(4, 1fr) !important; grid-template-rows: repeat(2, 1fr) !important; gap: 5mm 5mm !important; width: 100% !important; height: 100% !important; box-sizing: border-box !important; }';
+    html += '.barkod-print-card { width: 100% !important; height: 100% !important; background: white !important; border: 1.5px solid #000 !important; padding: 3mm !important; box-sizing: border-box !important; display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important; page-break-inside: avoid !important; break-inside: avoid !important; overflow: hidden !important; }';
+    html += '.barkod-print-header { font-size: 7pt !important; font-weight: 700 !important; color: #1a5d3a !important; margin-bottom: 1mm !important; text-align: center !important; line-height: 1.1 !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }';
+    html += '.barkod-print-isci { font-size: 8pt !important; font-weight: 700 !important; color: #000 !important; margin-bottom: 1mm !important; text-align: center !important; line-height: 1.1 !important; word-break: break-word !important; max-width: 100% !important; }';
+    html += '.barkod-print-card svg { max-width: 95% !important; max-height: 20mm !important; height: auto !important; width: auto !important; }';
+    html += '.barkod-print-kod { font-size: 8pt !important; font-weight: 800 !important; font-family: "Courier New", monospace !important; letter-spacing: 2px !important; margin-top: 0.5mm !important; color: #000 !important; text-align: center !important; }';
+    html += '</style>';
+    html += '<script src="https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.11.5/JsBarcode.all.min.js"><\/script>';
+    html += '</head><body>';
 
-                for (let i = baslangic; i < bitis; i++) {
-                    const c = yazdirilacakCalisanlar[i];
-                    const card = createBarkodPrintCard(c);
-                    grid.appendChild(card);
-                }
+    // Sayfaları oluştur
+    for (let sayfa = 0; sayfa < sayfaSayisi; sayfa++) {
+        html += '<div class="barkod-print-page">';
+        html += '<div class="barkod-print-grid">';
 
-                printArea.appendChild(grid);
+        const baslangic = sayfa * KART_SAYISI_SAYFA;
+        const bitis = Math.min(baslangic + KART_SAYISI_SAYFA, toplamKart);
 
-                if (sayfa < sayfaSayisi - 1) {
-                    const pageBreak = document.createElement('div');
-                    pageBreak.className = 'barkod-page-break';
-                    pageBreak.style.cssText = 'page-break-after: always; break-after: page; height: 0; overflow: hidden;';
-                    printArea.appendChild(pageBreak);
-                }
-            }
-
-            // Barkodları render et
-            setTimeout(() => {
-                yazdirilacakCalisanlar.forEach(c => {
-                    JsBarcode('#barkod-print-svg-' + c.id, c.barkod, { 
-                        format: "CODE128", 
-                        lineColor: "#000", 
-                        width: 1.5, 
-                        height: 55, 
-                        displayValue: false, 
-                        margin: 0,
-                        fontSize: 0
-                    });
-                });
-
-                setTimeout(() => { 
-                    window.print(); 
-                    setTimeout(() => { 
-                        printArea.classList.add('hidden'); 
-                        printArea.innerHTML = ''; 
-                    }, 1000); 
-                }, 800);
-            }, 300);
+        for (let i = baslangic; i < bitis; i++) {
+            const c = yazdirilacakCalisanlar[i];
+            html += '<div class="barkod-print-card">';
+            html += '<div class="barkod-print-header">SEBAT GÜLYAĞI - TARIM İŞLETMESİ</div>';
+            html += '<div class="barkod-print-isci">' + escapeHtml(c.ad.toUpperCase()) + ' ' + escapeHtml(c.soyad.toUpperCase()) + '</div>';
+            html += '<svg id="barkod-svg-' + c.id + '-' + sayfa + '"></svg>';
+            html += '<div class="barkod-print-kod">' + c.barkod + '</div>';
+            html += '</div>';
         }
+
+        html += '</div></div>';
+    }
+
+    html += '<script>';
+    html += 'window.onload = function() {';
+    for (let sayfa = 0; sayfa < sayfaSayisi; sayfa++) {
+        const baslangic = sayfa * KART_SAYISI_SAYFA;
+        const bitis = Math.min(baslangic + KART_SAYISI_SAYFA, toplamKart);
+        for (let i = baslangic; i < bitis; i++) {
+            const c = yazdirilacakCalisanlar[i];
+            html += 'JsBarcode("#barkod-svg-' + c.id + '-' + sayfa + '", "' + c.barkod + '", { format: "CODE128", lineColor: "#000", width: 1.5, height: 55, displayValue: false, margin: 0, fontSize: 0 });';
+        }
+    }
+    html += 'setTimeout(function() { window.print(); }, 300);';
+    html += '};';
+    html += '<\/script>';
+    html += '</body></html>';
+
+    printWindow.document.write(html);
+    printWindow.document.close();
+}
 
         // ===================== ARAZİLER =====================
         function renderAraziler() {
@@ -4466,6 +4477,6 @@
             checkSession();
         });
     </script>
-    <div id="barkodPrintArea" class="hidden" style="position:fixed;top:0;left:0;width:100%;min-height:100%;background:white;z-index:99999;"></div>
+    
 </body>
 </html>
