@@ -852,6 +852,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 <base target="_blank">
 <base target="_blank">
+<base target="_blank">
 </head>
 <body>
 
@@ -1037,18 +1038,23 @@
                                 <h3><i class="fas fa-tools"></i> İş Türü Seçimi</h3>
                                 <div class="is-turu-grid" id="isTuruGrid"></div>
                             </div>
-                            <!-- Hasat KG Girişi (sadece Hasat seçildiğinde göster) -->
-                            <div class="terminal-is-turu hidden" id="hasatKgPanel">
-                                <h3><i class="fas fa-weight-hanging"></i> Toplanan KG Miktarı</h3>
-                                <input type="number" class="terminal-kg-input" id="terminalKgInput" placeholder="KG MİKTARI..." step="0.01" min="0">
-                                <div style="color:var(--terminal-muted);font-size:0.8rem;margin-top:8px;text-align:center;">
-                                    Birim Fiyat: <strong id="terminalKgBirimFiyat">0.00</strong> ₺/kg | Hesaplanan: <strong id="terminalHesaplananTutar">0.00</strong> ₺
+                            <div id="terminalResultCard" style="display: none;"></div>
+                            <!-- Tarih Seçici ve Gün Kapatma -->
+                            <div class="terminal-is-turu" style="margin-bottom: 20px;">
+                                <h3><i class="fas fa-calendar-alt"></i> Kayıt Günü</h3>
+                                <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                                    <input type="date" class="terminal-input" id="terminalTarihSecici" value="" style="flex: 1; min-width: 140px;">
+                                    <button class="terminal-btn" id="btnGunKapat" style="background: var(--warning); color: #92400e; font-size: 0.85rem; padding: 10px 16px;">
+                                        <i class="fas fa-moon"></i> Günü Kapat
+                                    </button>
+                                </div>
+                                <div id="terminalTarihBilgi" style="color:var(--terminal-muted);font-size:0.8rem;margin-top:8px;">
+                                    Seçili gün için kayıtları görüntülüyorsunuz.
                                 </div>
                             </div>
-                            <div id="terminalResultCard" style="display: none;"></div>
                             <div class="terminal-list">
-                                <div class="terminal-list-header">
-                                    <h3><i class="fas fa-list"></i> Bugünkü Kayıtlar</h3>
+                                <div class="terminal-list-header" style="display: flex; justify-content: space-between; align-items: center;">
+                                    <h3><i class="fas fa-list"></i> <span id="terminalKayitBaslik">Bugünkü Kayıtlar</span></h3>
                                     <span class="count" id="bugunKayitSayisi">0</span>
                                 </div>
                                 <div id="terminalKayitListesi"></div>
@@ -1610,7 +1616,7 @@
 
     <script>
         // ===================== SABİTLER =====================
-        const IS_TURLERI = ['Genel İşçilik', 'Gübreleme', 'İlaçlama', 'Sulama', 'Budama', 'Toprak İşleme', 'Ağır İşçilik', 'Toplama'];
+        const IS_TURLERI = ['Genel İşçilik', 'Gübreleme', 'İlaçlama', 'Sulama', 'Budama', 'Toprak İşleme', 'Ağır İşçilik'];
         const DEFAULT_YEVMIYE = { 'Genel İşçilik': 500, 'Gübreleme': 550, 'İlaçlama': 600, 'Sulama': 450, 'Budama': 550, 'Toprak İşleme': 600, 'Ağır İşçilik': 750 };
         const AGIR_ISLER = ['Ağır İşçilik'];
         const AYLAR = ['','Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
@@ -2181,7 +2187,13 @@
             document.getElementById('terminalBarkodInput').addEventListener('keydown', function(e) {
                 if(e.key === 'Enter') terminalBarkodOkut();
             });
-            document.getElementById('terminalKgInput').addEventListener('input', hesaplaTerminalKg);
+            document.getElementById('terminalTarihSecici').addEventListener('change', function() {
+                renderTerminalKayitlar();
+                const t = this.value;
+                const bugunMu = t === todayStr();
+                document.getElementById('terminalTarihBilgi').textContent = bugunMu ? 'Bugün için kayıtları görüntülüyorsunuz.' : formatDate(t) + ' tarihli kayıtları görüntülüyorsunuz.';
+            });
+            document.getElementById('btnGunKapat').addEventListener('click', gunKapat);
 
             // Toplamalar
             document.getElementById('btnYeniToplama').addEventListener('click', openToplamaModal);
@@ -2648,38 +2660,23 @@ function printBarkodlar(mode) {
         function selectIsTuru(tur) {
             selectedIsTuru = tur;
             document.querySelectorAll('.is-turu-btn').forEach(btn => { btn.classList.toggle('active', btn.dataset.tur === tur); });
-
-            // Toplama seçildiğinde KG panelini göster
-            const hasatPanel = document.getElementById('hasatKgPanel');
-            if (tur === 'Toplama') {
-                hasatPanel.classList.remove('hidden');
-                document.getElementById('terminalKgBirimFiyat').textContent = getKgUcreti(todayStr()).toFixed(2);
-                hesaplaTerminalKg();
-                const panelTitle = hasatPanel.querySelector('h3');
-                if (panelTitle) panelTitle.innerHTML = '<i class="fas fa-weight-hanging"></i> Toplanan KG Miktarı (Çıkışta Girilir)';
-            } else {
-                hasatPanel.classList.add('hidden');
-            }
         }
 
-        function hesaplaTerminalKg() {
-            const kg = parseFloat(document.getElementById('terminalKgInput').value) || 0;
-            const birim = getKgUcreti(todayStr());
-            document.getElementById('terminalHesaplananTutar').textContent = (kg * birim).toFixed(2);
-        }
+        /* hesaplaTerminalKg kaldırıldı - Toplama iş terminalinden çıkarıldı */
 
         function renderTerminal() { 
             renderIsTuruGrid(); 
+            const tarihSecici = document.getElementById('terminalTarihSecici');
+            if (tarihSecici && !tarihSecici.value) tarihSecici.value = todayStr();
             renderTerminalKayitlar(); 
             updateTerminalBadge(); 
             document.getElementById('terminalBarkodInput').focus();
-            document.getElementById('hasatKgPanel').classList.add('hidden');
             terminalAktifCalisan = null;
         }
 
         function updateTerminalBadge() {
             const girisler = DB.get('girisler', []);
-            const t = todayStr();
+            const t = document.getElementById('terminalTarihSecici')?.value || todayStr();
             const bugun = girisler.filter(g => g.tarih === t);
             const sahada = bugun.filter(g => g.durum === 'giris_yapti' && !g.yasak).length;
             const badge = document.getElementById('terminalStatusBadge');
@@ -2703,7 +2700,7 @@ function printBarkodlar(mode) {
             }
             /* Tüm işçiler 18+ olduğu için yaş kontrolü kaldırıldı */
 
-            const t = todayStr();
+            const t = document.getElementById('terminalTarihSecici').value || todayStr();
             const girisler = DB.get('girisler', []);
             const bugunKayitlar = girisler.filter(g => g.calisan_id === calisan.id && g.tarih === t && !g.yasak).sort((a, b) => new Date(a.zaman) - new Date(b.zaman));
             let acikGiris = null;
@@ -2713,98 +2710,35 @@ function printBarkodlar(mode) {
 
             if (acikGiris) {
                 // ÇIKIŞ İŞLEMİ
-
-                // TOPLAMA ÇIKIŞI: KG girilerek toplama kaydı oluştur
-                if (acikGiris.is_turu === 'Toplama') {
-                    const kg = parseFloat(document.getElementById('terminalKgInput').value) || 0;
-                    if (kg <= 0) {
-                        showTerminalResult('warning', 'KG GİRİŞİ GEREKLİ', '<strong>' + calisan.ad + ' ' + calisan.soyad + '</strong><br>Toplama işi bitiminde toplanan KG miktarını giriniz.<br><span style="color:var(--terminal-warning)">Lütfen KG alanına miktar girin ve tekrar barkod okutun.</span>');
-                        showToast('Çıkış için KG miktarı girilmeli!', 'warning');
-                        return;
-                    }
-                    const birimFiyat = getKgUcreti(t);
-                    const toplamaTutar = kg * birimFiyat;
-
-                    // Hasat & Toplama kayıtlarına ekle
-                    const toplamalar = DB.get('toplamalar', []);
-                    toplamalar.push({
-                        id: uuid(), calisan_id: calisan.id, tarih: t, kg: kg,
-                        birim_fiyat: birimFiyat, tutar: toplamaTutar,
-                        not: 'El terminali toplama kaydı',
-                        yil: parseInt(t.split('-')[0]),
-                        zaman: new Date().toISOString()
-                    });
-                    DB.set('toplamalar', toplamalar);
-
-                    // Giriş kaydını kapat
-                    acikGiris.cikis_tarihi = new Date().toISOString();
-                    acikGiris.durum = 'cikis_yapti';
-                    acikGiris.kg = kg;
-                    acikGiris.toplama_tutar = toplamaTutar;
-                    DB.set('girisler', girisler);
-
-                    document.getElementById('terminalKgInput').value = '';
-                    document.getElementById('terminalHesaplananTutar').textContent = '0.00';
-
-                    const girisZamani = new Date(acikGiris.giris_tarihi);
-                    const cikisZamani = new Date();
-                    const diffMs = cikisZamani - girisZamani;
-                    const diffSaat = Math.floor(diffMs / (1000 * 60 * 60));
-                    const diffDakika = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-
-                    showTerminalResult('success', 'TOPLAMA TAMAMLANDI', '<strong>' + calisan.ad + ' ' + calisan.soyad + '</strong><br>İş Türü: <span style="color:var(--terminal-success)">Toplama</span><br>Toplanan: <strong>' + kg.toFixed(2) + ' kg</strong><br>Birim Fiyat: <strong>' + birimFiyat.toFixed(2) + ' ₺/kg</strong><br>Tutar: <strong>' + toplamaTutar.toFixed(2) + ' ₺</strong><br>Çalışma Süresi: <strong>' + diffSaat + 's ' + diffDakika + 'dk</strong><br><span style="color:var(--terminal-success)">Kayıt Hasat & Toplama bölümüne eklendi.</span>');
-                    showToast('Toplama kaydı: ' + kg.toFixed(2) + ' kg (' + toplamaTutar.toFixed(2) + ' ₺)', 'success');
-                } else {
-                    // NORMAL ÇIKIŞ
-                    acikGiris.cikis_tarihi = new Date().toISOString();
-                    acikGiris.durum = 'cikis_yapti';
-                    DB.set('girisler', girisler);
-                    const girisZamani = new Date(acikGiris.giris_tarihi);
-                    const cikisZamani = new Date();
-                    const diffMs = cikisZamani - girisZamani;
-                    const diffSaat = Math.floor(diffMs / (1000 * 60 * 60));
-                    const diffDakika = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-                    showTerminalResult('success', 'ÇIKIŞ BAŞARILI', '<strong>' + calisan.ad + ' ' + calisan.soyad + '</strong><br>İş Türü: <span style="color:var(--terminal-success)">' + (acikGiris.is_turu || 'Genel İşçilik') + '</span><br>Giriş: ' + formatTime(acikGiris.giris_tarihi) + '<br>Çıkış: ' + formatTime(acikGiris.cikis_tarihi) + '<br>Çalışma Süresi: <strong>' + diffSaat + 's ' + diffDakika + 'dk</strong>');
-                    showToast('Çıkış kaydedildi.');
-                }
+                acikGiris.cikis_tarihi = new Date().toISOString();
+                acikGiris.durum = 'cikis_yapti';
+                DB.set('girisler', girisler);
+                const girisZamani = new Date(acikGiris.giris_tarihi);
+                const cikisZamani = new Date();
+                const diffMs = cikisZamani - girisZamani;
+                const diffSaat = Math.floor(diffMs / (1000 * 60 * 60));
+                const diffDakika = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+                showTerminalResult('success', 'ÇIKIŞ BAŞARILI', '<strong>' + calisan.ad + ' ' + calisan.soyad + '</strong><br>İş Türü: <span style="color:var(--terminal-success)">' + (acikGiris.is_turu || 'Genel İşçilik') + '</span><br>Giriş: ' + formatTime(acikGiris.giris_tarihi) + '<br>Çıkış: ' + formatTime(acikGiris.cikis_tarihi) + '<br>Çalışma Süresi: <strong>' + diffSaat + 's ' + diffDakika + 'dk</strong>');
+                showToast('Çıkış kaydedildi.');
             } else {
                 // GİRİŞ İŞLEMİ
                 if (!araziId) { showToast('Aktif arazi bulunamadı! Önce arazi ekleyin.', 'warning'); return; }
+                const ucret = getYevmiyeUcreti(selectedIsTuru, t);
+                const yeniGiris = { 
+                    id: uuid(), calisan_id: calisan.id, arazi_id: araziId, 
+                    giris_tarihi: new Date().toISOString(), cikis_tarihi: null, 
+                    durum: 'giris_yapti', yevmiye_tutar: ucret, is_turu: selectedIsTuru, 
+                    tarih: t, zaman: new Date().toISOString()
+                };
+                girisler.push(yeniGiris);
+                DB.set('girisler', girisler);
 
-                // TOPLAMA GİRİŞİ: Sadece giriş kaydı oluştur, KG çıkışta girilecek
-                if (selectedIsTuru === 'Toplama') {
-                    const yeniGiris = { 
-                        id: uuid(), calisan_id: calisan.id, arazi_id: araziId, 
-                        giris_tarihi: new Date().toISOString(), cikis_tarihi: null, 
-                        durum: 'giris_yapti', yevmiye_tutar: 0, is_turu: 'Toplama', 
-                        tarih: t, zaman: new Date().toISOString(),
-                        kg: 0, toplama_tutar: 0
-                    };
-                    girisler.push(yeniGiris);
-                    DB.set('girisler', girisler);
+                let resultBody = '<strong>' + calisan.ad + ' ' + calisan.soyad + '</strong><br>İş Türü: <span style="color:var(--terminal-success)">' + selectedIsTuru + '</span>';
+                resultBody += '<br>Yevmiye: <strong>' + ucret.toFixed(2) + ' ₺</strong>';
+                resultBody += '<br>Barkod: <code>' + calisan.barkod + '</code><br>Giriş Saati: ' + formatTime(yeniGiris.giris_tarihi);
 
-                    showTerminalResult('success', 'TOPLAMA GİRİŞİ BAŞARILI', '<strong>' + calisan.ad + ' ' + calisan.soyad + '</strong><br>İş Türü: <span style="color:var(--terminal-success)">Toplama</span><br><span style="color:var(--terminal-warning)">Gün sonunda barkodu tekrar okutup KG miktarını giriniz.</span><br>Giriş Saati: ' + formatTime(yeniGiris.giris_tarihi));
-                    showToast('Toplama girişi kaydedildi. Gün sonunda KG giriniz.');
-                } else {
-                    // NORMAL İŞ TÜRÜ (Toplama dışı)
-                    const ucret = getYevmiyeUcreti(selectedIsTuru, t);
-                    const yeniGiris = { 
-                        id: uuid(), calisan_id: calisan.id, arazi_id: araziId, 
-                        giris_tarihi: new Date().toISOString(), cikis_tarihi: null, 
-                        durum: 'giris_yapti', yevmiye_tutar: ucret, is_turu: selectedIsTuru, 
-                        tarih: t, zaman: new Date().toISOString(),
-                        kg: 0, toplama_tutar: 0
-                    };
-                    girisler.push(yeniGiris);
-                    DB.set('girisler', girisler);
-
-                    let resultBody = '<strong>' + calisan.ad + ' ' + calisan.soyad + '</strong><br>İş Türü: <span style="color:var(--terminal-success)">' + selectedIsTuru + '</span>';
-                    resultBody += '<br>Yevmiye: <strong>' + ucret.toFixed(2) + ' ₺</strong>';
-                    resultBody += '<br>Barkod: <code>' + calisan.barkod + '</code><br>Giriş Saati: ' + formatTime(yeniGiris.giris_tarihi);
-
-                    showTerminalResult('success', 'GİRİŞ BAŞARILI', resultBody);
-                    showToast('Giriş kaydedildi.');
-                }
+                showTerminalResult('success', 'GİRİŞ BAŞARILI', resultBody);
+                showToast('Giriş kaydedildi.');
             }
             updateTerminalBadge(); renderTerminalKayitlar(); renderDashboard();
         }
@@ -2818,24 +2752,25 @@ function printBarkodlar(mode) {
         }
 
         function renderTerminalKayitlar() {
-            const t = todayStr();
+            const t = document.getElementById('terminalTarihSecici').value || todayStr();
+            const bugunMu = t === todayStr();
+            const baslik = bugunMu ? 'Bugünkü Kayıtlar' : formatDate(t) + ' Kayıtları';
+            document.getElementById('terminalKayitBaslik').textContent = baslik;
+
             const girisler = DB.get('girisler', []).filter(g => g.tarih === t).sort((a,b) => new Date(b.zaman) - new Date(a.zaman));
             const calisanlar = DB.get('calisanlar', []);
             const container = document.getElementById('terminalKayitListesi');
             document.getElementById('bugunKayitSayisi').textContent = girisler.length;
-            if (girisler.length === 0) { container.innerHTML = '<div style="padding:24px;text-align:center;color:var(--terminal-muted)">Bugün için kayıt bulunmuyor</div>'; return; }
+            if (girisler.length === 0) { container.innerHTML = '<div style="padding:24px;text-align:center;color:var(--terminal-muted)">' + (bugunMu ? 'Bugün' : formatDate(t)) + ' için kayıt bulunmuyor</div>'; return; }
             container.innerHTML = girisler.map(g => {
                 const c = calisanlar.find(x => x.id === g.calisan_id);
                 if (!c) return '';
                 let statusClass = 'cikis', statusText = 'Çıkış';
                 if (g.durum === 'giris_yapti') { statusClass = 'giris'; statusText = 'Giriş'; }
                 const isTuruBadge = g.is_turu ? '<span style="color:var(--terminal-muted);font-size:0.75rem;">' + g.is_turu + '</span>' : '';
-                let kgInfo = '';
-                if (g.is_turu === 'Toplama') {
-                    if (g.kg > 0) { kgInfo = ' | ' + g.kg.toFixed(2) + ' kg'; }
-                    else if (g.durum === 'giris_yapti') { kgInfo = ' <span style="color:var(--terminal-warning);font-size:0.75rem;">(KG bekleniyor)</span>'; }
-                }
-                return '<div class="terminal-list-item"><div class="list-item-info"><div class="list-item-name">' + c.ad + ' ' + c.soyad + kgInfo + '</div><div class="list-item-meta">' + formatTime(g.zaman) + ' ' + isTuruBadge + '</div></div><div style="display:flex;align-items:center;gap:8px;"><span class="list-item-status ' + statusClass + '">' + statusText + '</span><button class="list-item-btn delete sil-terminal-btn" data-id="' + g.id + '" title="Kaydı Sil"><i class="fas fa-trash-alt"></i></button></div></div>';
+                let yevmiyeInfo = '';
+                if (g.yevmiye_tutar > 0) { yevmiyeInfo = ' <span style="color:var(--terminal-success);font-size:0.75rem;">' + g.yevmiye_tutar.toFixed(0) + ' ₺</span>'; }
+                return '<div class="terminal-list-item"><div class="list-item-info"><div class="list-item-name">' + c.ad + ' ' + c.soyad + yevmiyeInfo + '</div><div class="list-item-meta">' + formatTime(g.zaman) + ' ' + isTuruBadge + '</div></div><div style="display:flex;align-items:center;gap:8px;"><span class="list-item-status ' + statusClass + '">' + statusText + '</span><button class="list-item-btn delete sil-terminal-btn" data-id="' + g.id + '" title="Kaydı Sil"><i class="fas fa-trash-alt"></i></button></div></div>';
             }).join('');
 
             document.querySelectorAll('.sil-terminal-btn').forEach(btn => {
@@ -2852,20 +2787,72 @@ function printBarkodlar(mode) {
                 const t = kayit.tarih; const calisanId = kayit.calisan_id;
                 const sonrakiCikis = girisler.find(g => g.calisan_id === calisanId && g.tarih === t && g.durum === 'cikis_yapti' && new Date(g.zaman) > new Date(kayit.zaman));
                 if (sonrakiCikis) { 
-                    // Toplama çıkışı ise toplama kaydını da sil
-                    if (sonrakiCikis.is_turu === 'Toplama') {
-                        DB.set('toplamalar', DB.get('toplamalar', []).filter(tp => !(tp.calisan_id === sonrakiCikis.calisan_id && tp.tarih === sonrakiCikis.tarih && tp.not === 'El terminali toplama kaydı')));
-                    }
                     DB.set('girisler', girisler.filter(g => g.id !== sonrakiCikis.id)); 
                 }
-            }
-            // İlgili toplama kaydını da sil (varsa) - Toplama kayıtları için
-            if (kayit.is_turu === 'Toplama') {
-                DB.set('toplamalar', DB.get('toplamalar', []).filter(t => !(t.calisan_id === kayit.calisan_id && t.tarih === kayit.tarih && t.not === 'El terminali toplama kaydı')));
             }
             DB.set('girisler', DB.get('girisler', []).filter(g => g.id !== id));
             renderTerminalKayitlar(); updateTerminalBadge(); renderDashboard();
             showToast('Kayıt silindi.');
+        }
+
+        // Gün kapatma fonksiyonu - açık girişleri otomatik çıkış olarak işaretler
+        function gunKapat() {
+            const t = document.getElementById('terminalTarihSecici').value || todayStr();
+            const bugunMu = t === todayStr();
+
+            if (bugunMu) {
+                if (!confirm('BUGÜNÜ kapatmak istediğinize emin misiniz?\n\nÇıkış yapmayan işçilerin girişleri otomatik olarak kapatılacak ve yevmiyeleri hesaplanacaktır.\n\nBu işlem geri alınamaz!')) return;
+            } else {
+                if (!confirm(formatDate(t) + ' tarihini kapatmak istediğinize emin misiniz?\n\nÇıkış yapmayan işçilerin girişleri otomatik olarak kapatılacak ve yevmiyeleri hesaplanacaktır.\n\nBu işlem geri alınamaz!')) return;
+            }
+
+            const girisler = DB.get('girisler', []);
+            let kapatilanSayi = 0;
+
+            // Seçili gündeki açık girişleri bul ve kapat
+            girisler.forEach(g => {
+                if (g.tarih === t && g.durum === 'giris_yapti' && !g.yasak) {
+                    // Gün sonu saati olarak 23:59:59 kullan
+                    const gunSonu = t + 'T23:59:59';
+                    g.cikis_tarihi = gunSonu;
+                    g.durum = 'cikis_yapti';
+                    g.otomatik_kapatildi = true;
+                    kapatilanSayi++;
+                }
+            });
+
+            if (kapatilanSayi > 0) {
+                DB.set('girisler', girisler);
+                renderTerminalKayitlar();
+                updateTerminalBadge();
+                renderDashboard();
+                showToast(kapatilanSayi + ' işçinin girişi otomatik olarak kapatıldı.', 'success');
+            } else {
+                showToast('Kapatılacak açık giriş bulunmuyor.', 'warning');
+            }
+        }
+
+        // Uygulama başlatılırken geçmiş günlerin açık kayıtlarını otomatik kapat
+        function otomatikGunKapat() {
+            const girisler = DB.get('girisler', []);
+            const bugun = todayStr();
+            let kapatilanSayi = 0;
+
+            girisler.forEach(g => {
+                // Bugünden önceki günlerde açık kalan girişleri kapat
+                if (g.tarih < bugun && g.durum === 'giris_yapti' && !g.yasak && !g.otomatik_kapatildi) {
+                    const gunSonu = g.tarih + 'T23:59:59';
+                    g.cikis_tarihi = gunSonu;
+                    g.durum = 'cikis_yapti';
+                    g.otomatik_kapatildi = true;
+                    kapatilanSayi++;
+                }
+            });
+
+            if (kapatilanSayi > 0) {
+                DB.set('girisler', girisler);
+                showToast(kapatilanSayi + ' geçmiş gün açık giriş otomatik kapatıldı.', 'info');
+            }
         }
 
         
@@ -4474,6 +4461,7 @@ function printBarkodlar(mode) {
         window.addEventListener('DOMContentLoaded', async () => {
             await initCloudData();
             initEventListeners();
+            otomatikGunKapat(); // Geçmiş günlerin açık kayıtlarını otomatik kapat
             checkSession();
         });
     </script>
