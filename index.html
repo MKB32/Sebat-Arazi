@@ -853,6 +853,7 @@
 <base target="_blank">
 <base target="_blank">
 <base target="_blank">
+<base target="_blank">
 </head>
 <body>
 
@@ -2677,10 +2678,17 @@ function printBarkodlar(mode) {
         function updateTerminalBadge() {
             const girisler = DB.get('girisler', []);
             const t = document.getElementById('terminalTarihSecici')?.value || todayStr();
+
+            // Otomatik çıkış kontrolü
+            kontrolOtomatikCikis();
+
+            // Bugünkü kayıtları al
             const bugun = girisler.filter(g => g.tarih === t);
             const sahada = bugun.filter(g => g.durum === 'giris_yapti' && !g.yasak).length;
+            const cikisYapan = bugun.filter(g => g.durum === 'cikis_yapti' && !g.yasak).length;
             const badge = document.getElementById('terminalStatusBadge');
-            if (sahada > 0) { badge.textContent = sahada + ' Kişi Sahada'; badge.style.background = 'var(--terminal-success)'; }
+            if (sahada > 0) { badge.textContent = sahada + ' Kişi Sahada (' + cikisYapan + ' Çıktı)'; badge.style.background = 'var(--terminal-success)'; }
+            else if (cikisYapan > 0) { badge.textContent = 'Tüm İşçiler Çıktı (' + cikisYapan + ')'; badge.style.background = 'var(--primary)'; }
             else { badge.textContent = 'Hazır'; badge.style.background = 'var(--primary)'; }
         }
 
@@ -2709,9 +2717,10 @@ function printBarkodlar(mode) {
             const araziId = araziler.length > 0 ? araziler[0].id : null;
 
             if (acikGiris) {
-                // ÇIKIŞ İŞLEMİ
+                // ÇIKIŞ İŞLEMİ - Manuel çıkış
                 acikGiris.cikis_tarihi = new Date().toISOString();
                 acikGiris.durum = 'cikis_yapti';
+                acikGiris.cikis_tipi = 'manuel';
                 DB.set('girisler', girisler);
                 const girisZamani = new Date(acikGiris.giris_tarihi);
                 const cikisZamani = new Date();
@@ -2728,10 +2737,13 @@ function printBarkodlar(mode) {
                     id: uuid(), calisan_id: calisan.id, arazi_id: araziId, 
                     giris_tarihi: new Date().toISOString(), cikis_tarihi: null, 
                     durum: 'giris_yapti', yevmiye_tutar: ucret, is_turu: selectedIsTuru, 
-                    tarih: t, zaman: new Date().toISOString()
+                    tarih: t, zaman: new Date().toISOString(), cikis_tipi: null
                 };
                 girisler.push(yeniGiris);
                 DB.set('girisler', girisler);
+
+                // Otomatik olarak Arazi Uygulamaları'na ekle
+                otomatikAraziUygulamasiEkle(calisan.id, araziId, selectedIsTuru, t);
 
                 let resultBody = '<strong>' + calisan.ad + ' ' + calisan.soyad + '</strong><br>İş Türü: <span style="color:var(--terminal-success)">' + selectedIsTuru + '</span>';
                 resultBody += '<br>Yevmiye: <strong>' + ucret.toFixed(2) + ' ₺</strong>';
@@ -2770,7 +2782,13 @@ function printBarkodlar(mode) {
                 const isTuruBadge = g.is_turu ? '<span style="color:var(--terminal-muted);font-size:0.75rem;">' + g.is_turu + '</span>' : '';
                 let yevmiyeInfo = '';
                 if (g.yevmiye_tutar > 0) { yevmiyeInfo = ' <span style="color:var(--terminal-success);font-size:0.75rem;">' + g.yevmiye_tutar.toFixed(0) + ' ₺</span>'; }
-                return '<div class="terminal-list-item"><div class="list-item-info"><div class="list-item-name">' + c.ad + ' ' + c.soyad + yevmiyeInfo + '</div><div class="list-item-meta">' + formatTime(g.zaman) + ' ' + isTuruBadge + '</div></div><div style="display:flex;align-items:center;gap:8px;"><span class="list-item-status ' + statusClass + '">' + statusText + '</span><button class="list-item-btn delete sil-terminal-btn" data-id="' + g.id + '" title="Kaydı Sil"><i class="fas fa-trash-alt"></i></button></div></div>';
+                let cikisTipiBadge = '';
+                if (g.durum === 'cikis_yapti') {
+                    if (g.cikis_tipi === 'otomatik_10saat') cikisTipiBadge = ' <span style="color:var(--terminal-warning);font-size:0.7rem;"><i class="fas fa-clock"></i> Oto-10s</span>';
+                    else if (g.cikis_tipi === 'otomatik_gunsonu') cikisTipiBadge = ' <span style="color:var(--terminal-warning);font-size:0.7rem;"><i class="fas fa-moon"></i> Oto-Gün</span>';
+                    else if (g.cikis_tipi === 'manuel') cikisTipiBadge = ' <span style="color:var(--terminal-success);font-size:0.7rem;"><i class="fas fa-hand-pointer"></i> Manuel</span>';
+                }
+                return '<div class="terminal-list-item"><div class="list-item-info"><div class="list-item-name">' + c.ad + ' ' + c.soyad + yevmiyeInfo + '</div><div class="list-item-meta">' + formatTime(g.zaman) + ' ' + isTuruBadge + cikisTipiBadge + '</div></div><div style="display:flex;align-items:center;gap:8px;"><span class="list-item-status ' + statusClass + '">' + statusText + '</span><button class="list-item-btn delete sil-terminal-btn" data-id="' + g.id + '" title="Kaydı Sil"><i class="fas fa-trash-alt"></i></button></div></div>';
             }).join('');
 
             document.querySelectorAll('.sil-terminal-btn').forEach(btn => {
@@ -2833,17 +2851,47 @@ function printBarkodlar(mode) {
         }
 
         // Uygulama başlatılırken geçmiş günlerin açık kayıtlarını otomatik kapat
+        // 10 saat sonra otomatik çıkış fonksiyonu
+        function kontrolOtomatikCikis() {
+            const girisler = DB.get('girisler', []);
+            const simdi = new Date();
+            let degisiklik = false;
+
+            girisler.forEach(g => {
+                if (g.durum === 'giris_yapti' && !g.yasak) {
+                    const girisZamani = new Date(g.giris_tarihi);
+                    const farkSaat = (simdi - girisZamani) / (1000 * 60 * 60);
+
+                    // 10 saatten fazla olduysa otomatik çıkış
+                    if (farkSaat >= 10) {
+                        // Giriş tarihinin gün sonu 23:59:59 olarak ayarla
+                        const girisTarihStr = g.tarih;
+                        g.cikis_tarihi = girisTarihStr + 'T23:59:59';
+                        g.durum = 'cikis_yapti';
+                        g.cikis_tipi = 'otomatik_10saat';
+                        g.otomatik_kapatildi = true;
+                        degisiklik = true;
+                    }
+                }
+            });
+
+            if (degisiklik) {
+                DB.set('girisler', girisler);
+            }
+        }
+
         function otomatikGunKapat() {
             const girisler = DB.get('girisler', []);
             const bugun = todayStr();
             let kapatilanSayi = 0;
 
             girisler.forEach(g => {
-                // Bugünden önceki günlerde açık kalan girişleri kapat
+                // Bugünden önceki günlerde açık kalan girişleri kapat (10 saat kuralı zaten işlemiş olmalı ama yedek olarak)
                 if (g.tarih < bugun && g.durum === 'giris_yapti' && !g.yasak && !g.otomatik_kapatildi) {
                     const gunSonu = g.tarih + 'T23:59:59';
                     g.cikis_tarihi = gunSonu;
                     g.durum = 'cikis_yapti';
+                    g.cikis_tipi = 'otomatik_gunsonu';
                     g.otomatik_kapatildi = true;
                     kapatilanSayi++;
                 }
@@ -3212,12 +3260,14 @@ function printBarkodlar(mode) {
             if (baslangic) uygulamalar = uygulamalar.filter(u => u.uygulama_tarihi >= baslangic);
             if (bitis) uygulamalar = uygulamalar.filter(u => u.uygulama_tarihi <= bitis);
             if (tur) uygulamalar = uygulamalar.filter(u => u.uygulama_turu === tur);
+            uygulamalar.sort((a,b) => new Date(b.uygulama_tarihi) - new Date(a.uygulama_tarihi));
             const araziler = DB.get('araziler', []);
             const tbody = document.getElementById('uygulamalarTable');
             if (uygulamalar.length === 0) { tbody.innerHTML = '<tr><td colspan="6" class="text-center" style="padding:32px;color:var(--gray)">Kayıt bulunmuyor</td></tr>'; return; }
             tbody.innerHTML = uygulamalar.map(u => {
                 const a = araziler.find(x => x.id === u.arazi_id);
-                return '<tr><td>' + formatDate(u.uygulama_tarihi) + '</td><td>' + (a ? a.arazi_adi : '-') + '</td><td><span class="badge badge-purple">' + u.uygulama_turu + '</span></td><td>' + (u.aciklama || '-') + '</td><td>' + (u.kaydeden || '-') + '</td><td><div class="action-btns"><button class="btn btn-sm btn-secondary edit-uygulama-btn" data-id="' + u.id + '"><i class="fas fa-edit"></i></button><button class="btn btn-sm btn-danger delete-uygulama-btn" data-id="' + u.id + '"><i class="fas fa-trash"></i></button></div></td></tr>';
+                const otomatikBadge = u.otomatik_kayit ? '<span class="badge badge-blue" style="margin-left:6px;"><i class="fas fa-robot"></i> Oto</span>' : '';
+                return '<tr><td>' + formatDate(u.uygulama_tarihi) + '</td><td>' + (a ? a.arazi_adi : '-') + '</td><td><span class="badge badge-purple">' + u.uygulama_turu + '</span>' + otomatikBadge + '</td><td>' + (u.aciklama || '-') + '</td><td>' + (u.kaydeden || '-') + '</td><td><div class="action-btns"><button class="btn btn-sm btn-secondary edit-uygulama-btn" data-id="' + u.id + '"><i class="fas fa-edit"></i></button><button class="btn btn-sm btn-danger delete-uygulama-btn" data-id="' + u.id + '"><i class="fas fa-trash"></i></button></div></td></tr>';
             }).join('');
 
             document.querySelectorAll('.edit-uygulama-btn').forEach(btn => {
@@ -3273,6 +3323,77 @@ function printBarkodlar(mode) {
             DB.set('uygulamalar', DB.get('uygulamalar', []).filter(u => u.id !== id));
             renderUygulamalar();
             showToast('Uygulama kaydı silindi.');
+        }
+
+        // ===================== OTOMATİK ARAZİ UYGULAMASI =====================
+        // İş terminalinden giriş yapıldığında, seçilen iş türüne göre otomatik arazi uygulaması ekle
+        function otomatikAraziUygulamasiEkle(calisanId, araziId, isTuru, tarih) {
+            // İş türlerini uygulama türlerine eşle
+            const isTuruToUygulama = {
+                'Gübreleme': 'Gübreleme',
+                'İlaçlama': 'İlaçlama',
+                'Sulama': 'Sulama',
+                'Budama': 'Budama',
+                'Toprak İşleme': 'Toprak İşleme',
+                'Hasat': 'Hasat',
+                'Genel İşçilik': 'Diğer',
+                'Ağır İşçilik': 'Diğer'
+            };
+
+            const uygulamaTuru = isTuruToUygulama[isTuru];
+            if (!uygulamaTuru) return; // Eşleşen uygulama türü yoksa ekleme
+
+            const uygulamalar = DB.get('uygulamalar', []);
+            const calisanlar = DB.get('calisanlar', []);
+            const araziler = DB.get('araziler', []);
+
+            const calisan = calisanlar.find(c => c.id === calisanId);
+            const arazi = araziler.find(a => a.id === araziId);
+
+            // Aynı gün, aynı arazi, aynı iş türü için mevcut kayıt var mı kontrol et
+            const mevcutKayit = uygulamalar.find(u => 
+                u.arazi_id === araziId && 
+                u.uygulama_turu === uygulamaTuru && 
+                u.uygulama_tarihi === tarih &&
+                u.otomatik_kayit === true
+            );
+
+            if (mevcutKayit) {
+                // Mevcut kayda işçi ekle (eğer bu işçi daha önce eklenmemişse)
+                const isciler = mevcutKayit.aciklama.match(/Çalışan İşçi Sayısı: ([0-9]+)/);
+                let mevcutSayi = isciler ? parseInt(isciler[1]) : 1;
+
+                // İşçi listesini kontrol et
+                let isciListesi = mevcutKayit.isci_listesi || [];
+                if (!isciListesi.includes(calisanId)) {
+                    isciListesi.push(calisanId);
+                    mevcutKayit.isci_listesi = isciListesi;
+                    mevcutKayit.aciklama = uygulamaTuru + ' işlemi yapılmıştır. Çalışan İşçi Sayısı: ' + isciListesi.length + ' kişi. İşçiler: ' + isciListesi.map(id => {
+                        const c = calisanlar.find(x => x.id === id);
+                        return c ? c.ad + ' ' + c.soyad : 'Bilinmiyor';
+                    }).join(', ');
+                    DB.set('uygulamalar', uygulamalar);
+                }
+            } else {
+                // Yeni kayıt oluştur
+                const isciAdi = calisan ? calisan.ad + ' ' + calisan.soyad : 'Bilinmiyor';
+                const araziAdi = arazi ? arazi.arazi_adi : 'Bilinmiyor';
+
+                const yeniUygulama = {
+                    id: uuid(),
+                    arazi_id: araziId,
+                    uygulama_turu: uygulamaTuru,
+                    uygulama_tarihi: tarih,
+                    aciklama: uygulamaTuru + ' işlemi yapılmıştır. Çalışan İşçi Sayısı: 1 kişi. İşçiler: ' + isciAdi,
+                    kaydeden: currentUser ? currentUser.username : 'Sistem',
+                    olusturma_tarihi: new Date().toISOString(),
+                    otomatik_kayit: true,
+                    isci_listesi: [calisanId]
+                };
+
+                uygulamalar.push(yeniUygulama);
+                DB.set('uygulamalar', uygulamalar);
+            }
         }
 
         // ===================== KULLANICI YÖNETİMİ =====================
@@ -4003,19 +4124,30 @@ function printBarkodlar(mode) {
         function raporGunlukGirisRaporla() {
             const tarih = document.getElementById('raporGunlukTarih').value;
             if (!tarih) return;
+
+            // Önce otomatik çıkış kontrolü yap
+            kontrolOtomatikCikis();
+
             const girisler = DB.get('girisler', []).filter(g => g.tarih === tarih).sort((a,b) => new Date(b.zaman) - new Date(a.zaman));
             const calisanlar = DB.get('calisanlar', []);
             let content = '';
             if (girisler.length === 0) { content = '<div style="padding:32px;text-align:center;color:var(--gray)">Bu tarih için kayıt bulunmuyor</div>'; }
             else {
-                content = '<div class="table-container"><table><thead><tr><th>Saat</th><th>İşçi</th><th>Barkod</th><th>İşlem</th><th>İş Türü</th><th>Durum</th></tr></thead><tbody>';
+                content = '<div class="table-container"><table><thead><tr><th>Saat</th><th>İşçi</th><th>Barkod</th><th>İşlem</th><th>İş Türü</th><th>Durum</th><th>Çıkış Tipi</th></tr></thead><tbody>';
                 girisler.forEach(g => {
                     const c = calisanlar.find(x => x.id === g.calisan_id);
                     if (!c) return;
                     const islem = g.durum === 'giris_yapti' ? '<span class="badge badge-green">Giriş</span>' : '<span class="badge badge-gray">Çıkış</span>';
                     const durum = g.durum === 'giris_yapti' ? '<span class="badge badge-blue">Sahada</span>' : '<span class="badge badge-gray">Çıktı</span>';
                     const isTuruBadge = g.is_turu ? '<span class="badge badge-purple">' + g.is_turu + '</span>' : '-';
-                    content += '<tr><td>' + formatTime(g.zaman) + '</td><td><strong>' + c.ad + ' ' + c.soyad + '</strong></td><td><code>' + (c.barkod || '-') + '</code></td><td>' + islem + '</td><td>' + isTuruBadge + '</td><td>' + durum + '</td></tr>';
+                    let cikisTipi = '-';
+                    if (g.durum === 'cikis_yapti') {
+                        if (g.cikis_tipi === 'manuel') cikisTipi = '<span class="badge badge-green"><i class="fas fa-hand-pointer"></i> Manuel</span>';
+                        else if (g.cikis_tipi === 'otomatik_10saat') cikisTipi = '<span class="badge badge-orange"><i class="fas fa-clock"></i> Oto (10s)</span>';
+                        else if (g.cikis_tipi === 'otomatik_gunsonu') cikisTipi = '<span class="badge badge-yellow"><i class="fas fa-moon"></i> Oto (Gün Sonu)</span>';
+                        else cikisTipi = '<span class="badge badge-gray">Bilinmiyor</span>';
+                    }
+                    content += '<tr><td>' + formatTime(g.zaman) + '</td><td><strong>' + c.ad + ' ' + c.soyad + '</strong></td><td><code>' + (c.barkod || '-') + '</code></td><td>' + islem + '</td><td>' + isTuruBadge + '</td><td>' + durum + '</td><td>' + cikisTipi + '</td></tr>';
                 });
                 content += '</tbody></table></div>';
             }
@@ -4064,14 +4196,79 @@ function printBarkodlar(mode) {
         function raporOdemeDurumu() {
             const odemeler = DB.get('odemeler', []);
             const calisanlar = DB.get('calisanlar', []);
+            const girisler = DB.get('girisler', []);
+            const toplamalar = DB.get('toplamalar', []);
+            const araOdemeler = DB.get('araOdemeler', []);
+
             let toplamBeklemede = 0; let toplamOdendi = 0;
             let beklemedeList = []; let odendiList = [];
+
+            // Mevcut ödeme kayıtlarından bekleme/ödendi listesi
             odemeler.forEach(o => {
                 const c = calisanlar.find(x => x.id === o.calisan_id);
                 const isim = c ? c.ad + ' ' + c.soyad : 'Bilinmiyor';
                 if (o.durum === 'odendi') { toplamOdendi += o.toplam_tutar; odendiList.push({ isim, donem: o.donem, tutar: o.toplam_tutar, tarih: o.odeme_tarihi, sekil: o.odeme_sekli }); }
                 else { toplamBeklemede += o.toplam_tutar; beklemedeList.push({ isim, donem: o.donem, tutar: o.toplam_tutar }); }
             });
+
+            // Günlük yevmiyesi oluşan ama henüz ödeme kaydı olmayan işçileri bul
+            // Son 30 gün içinde giriş yapmış işçiler
+            const otuzGunOnce = new Date();
+            otuzGunOnce.setDate(otuzGunOnce.getDate() - 30);
+
+            const aktifCalisanIds = new Set();
+            girisler.forEach(g => {
+                if (new Date(g.giris_tarihi) >= otuzGunOnce && !g.yasak) {
+                    aktifCalisanIds.add(g.calisan_id);
+                }
+            });
+
+            // Her aktif işçi için bekleyen ödeme hesapla
+            const bugun = new Date();
+            aktifCalisanIds.forEach(cid => {
+                const c = calisanlar.find(x => x.id === cid);
+                if (!c) return;
+
+                // İşçinin tüm giriş kayıtlarından günlük bazda hesapla
+                const iscininGirisleri = girisler.filter(g => g.calisan_id === cid && !g.yasak);
+                const gunluk = {};
+                iscininGirisleri.forEach(g => {
+                    const gunKey = g.tarih;
+                    if (!gunluk[gunKey]) {
+                        gunluk[gunKey] = { is_turu: g.is_turu || 'Genel İşçilik', yevmiye: g.yevmiye_tutar || getYevmiyeUcreti(g.is_turu || 'Genel İşçilik', g.tarih) };
+                    }
+                });
+
+                let toplamYevmiye = 0;
+                Object.values(gunluk).forEach(gun => { toplamYevmiye += gun.yevmiye; });
+
+                // Toplama tutarı
+                const iscininToplamalari = toplamalar.filter(t => t.calisan_id === cid);
+                let toplamaTutar = 0;
+                iscininToplamalari.forEach(t => { toplamaTutar += t.tutar; });
+
+                // Ara ödeme
+                const iscininAraOdemeleri = araOdemeler.filter(a => a.calisan_id === cid);
+                let araOdemeToplam = 0;
+                iscininAraOdemeleri.forEach(a => { araOdemeToplam += a.tutar; });
+
+                const netBorc = toplamYevmiye + toplamaTutar - araOdemeToplam;
+
+                // Eğer net borç pozitifse ve ödeme kaydı yoksa, bekleme listesine ekle
+                if (netBorc > 0) {
+                    const mevcutOdeme = odemeler.find(o => o.calisan_id === cid);
+                    if (!mevcutOdeme || mevcutOdeme.durum !== 'odendi') {
+                        const isim = c.ad + ' ' + c.soyad;
+                        // Eğer bu işçi zaten bekleme listesinde yoksa ekle
+                        const zatenVar = beklemedeList.some(b => b.isim === isim);
+                        if (!zatenVar) {
+                            beklemedeList.push({ isim, donem: 'Günlük Yevmiye', tutar: netBorc });
+                            toplamBeklemede += netBorc;
+                        }
+                    }
+                }
+            });
+
             let html = '<div class="card rapor-print">';
             html += '<div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">';
             html += '<div class="card-title"><i class="fas fa-money-check-alt"></i> Ödeme Durumu Raporu</div>';
@@ -4086,7 +4283,7 @@ function printBarkodlar(mode) {
             html += '<h3 style="margin-bottom:16px;color:var(--dark);"><i class="fas fa-clock"></i> Bekleyen Ödemeler</h3>';
             if (beklemedeList.length === 0) { html += '<div style="padding:20px;background:var(--gray-light);border-radius:var(--radius);color:var(--gray);margin-bottom:24px;">Bekleyen ödeme bulunmuyor</div>'; }
             else {
-                html += '<div class="table-container" style="margin-bottom:24px;"><table><thead><tr><th>İşçi</th><th>Dönem</th><th>Tutar</th><th>Durum</th></tr></thead><tbody>';
+                html += '<div class="table-container" style="margin-bottom:24px;"><table><thead><tr><th>İşçi</th><th>Dönem / Kaynak</th><th>Tutar</th><th>Durum</th></tr></thead><tbody>';
                 beklemedeList.forEach(b => { html += '<tr><td><strong>' + b.isim + '</strong></td><td>' + b.donem + '</td><td><strong style="color:var(--danger);">' + b.tutar.toFixed(2) + ' ₺</strong></td><td><span class="badge badge-gray">Beklemede</span></td></tr>'; });
                 html += '</tbody></table></div>';
             }
@@ -4462,7 +4659,20 @@ function printBarkodlar(mode) {
             await initCloudData();
             initEventListeners();
             otomatikGunKapat(); // Geçmiş günlerin açık kayıtlarını otomatik kapat
+            kontrolOtomatikCikis(); // 10 saat kontrolü
             checkSession();
+
+            // Her 5 dakikada bir otomatik çıkış kontrolü
+            setInterval(() => {
+                kontrolOtomatikCikis();
+                if (document.getElementById('page-dashboard') && !document.getElementById('page-dashboard').classList.contains('hidden')) {
+                    renderDashboard();
+                }
+                if (document.getElementById('page-terminal') && !document.getElementById('page-terminal').classList.contains('hidden')) {
+                    updateTerminalBadge();
+                    renderTerminalKayitlar();
+                }
+            }, 5 * 60 * 1000); // 5 dakika
         });
     </script>
     
