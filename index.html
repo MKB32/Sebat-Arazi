@@ -566,6 +566,42 @@
             width: 200px;
             text-align: center;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            position: relative;
+        }
+        .barkod-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .barkod-card.selected {
+            border-color: var(--primary) !important;
+            box-shadow: 0 0 0 3px rgba(26, 93, 58, 0.3), 0 4px 12px rgba(0,0,0,0.15) !important;
+            background: var(--primary-light) !important;
+        }
+        .barkod-select-indicator {
+            position: absolute;
+            top: 6px;
+            left: 6px;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            border: 2px solid var(--gray-border);
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            color: transparent;
+            transition: all 0.2s;
+            z-index: 2;
+        }
+        .barkod-card.selected .barkod-select-indicator {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
         }
         .barkod-card .barkod-header {
             font-size: 8pt;
@@ -850,6 +886,7 @@
     </style>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+<base target="_blank">
 <base target="_blank">
 <base target="_blank">
 <base target="_blank">
@@ -1371,8 +1408,11 @@
             <div class="modal-body" style="padding: 0;">
                 <div class="no-print" style="padding: 20px; background: var(--gray-light); border-bottom: 1px solid var(--gray-border);">
                     <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
-                        <button class="btn btn-primary" id="btnPrintBarkodTekli"><i class="fas fa-print"></i> Seçiliyi Yazdır</button>
+                    <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 12px;">
+                        <button class="btn btn-primary" id="btnPrintBarkodSecili"><i class="fas fa-print"></i> Seçili Olanları Yazdır</button>
                         <button class="btn btn-secondary" id="btnPrintBarkodHepsi"><i class="fas fa-print"></i> Tümünü Yazdır</button>
+                        <button class="btn btn-secondary" id="btnBarkodTumunuSec"><i class="fas fa-check-square"></i> Tümünü Seç</button>
+                        <button class="btn btn-secondary" id="btnBarkodSecimiTemizle"><i class="fas fa-square"></i> Seçimi Temizle</button>
                     </div>
                     <p style="text-align: center; margin-top: 12px; font-size: 0.8rem; color: var(--gray);"><i class="fas fa-info-circle"></i> Barkodları A4 yatay sayfada yazdırın. Her sayfada 8 barkod (4 sütun x 2 satır) yer alır.</p>
                 </div>
@@ -2267,8 +2307,10 @@
             });
 
             // Barkod print
-            document.getElementById('btnPrintBarkodTekli').addEventListener('click', function() { printBarkodlar('tekli'); });
+            document.getElementById('btnPrintBarkodSecili').addEventListener('click', function() { printBarkodlar('secili'); });
             document.getElementById('btnPrintBarkodHepsi').addEventListener('click', function() { printBarkodlar('hepsi'); });
+            document.getElementById('btnBarkodTumunuSec').addEventListener('click', selectAllBarkods);
+            document.getElementById('btnBarkodSecimiTemizle').addEventListener('click', clearBarkodSelection);
 
             // Ödeme düzenle
             document.getElementById('btnSaveOdemeEdit').addEventListener('click', saveOdemeEdit);
@@ -2358,19 +2400,25 @@
             const girisler = DB.get('girisler', []);
             const toplamalar = DB.get('toplamalar', []);
             const t = todayStr();
-            const bugunGiris = girisler.filter(g => g.tarih === t && g.durum === 'giris_yapti');
+            // Bugün araziye giriş yapan BENZERSİZ işçi sayısı (farklı kişiler)
+            const bugunGirenIsciIds = new Set();
+            girisler.filter(g => g.tarih === t && g.durum !== 'yasak').forEach(g => {
+                bugunGirenIsciIds.add(g.calisan_id);
+            });
+            const bugunCalisanSayisi = bugunGirenIsciIds.size;
             
             const bugunKg = toplamalar.filter(x => x.tarih === t).reduce((s, x) => s + (parseFloat(x.kg) || 0), 0);
-
-            // Bugünkü benzersiz gün sayısı (farklı işçilerin giriş yaptığı gün sayısı değil, toplam giriş kaydı)
-            const bugunGunluk = girisler.filter(g => g.tarih === t && g.durum === 'giris_yapti' && !g.yasak).length;
-
             const sahadaSimdi = girisler.filter(g => g.durum === 'giris_yapti' && !g.yasak).length;
+
+            // Bugünkü toplam yevmiye sayısı (giriş kaydı sayısı)
+            const bugunGirisKayitlari = girisler.filter(g => g.tarih === t && g.durum !== 'yasak');
+            const bugunYevmiyeSayisi = bugunGirisKayitlari.length;
+
             document.getElementById('statToplamCalisan').textContent = calisanlar.length;
-            document.getElementById('statBugunCalisan').textContent = bugunGiris.length;
+            document.getElementById('statBugunCalisan').textContent = bugunCalisanSayisi;
             document.getElementById('statSahadaSimdi').textContent = sahadaSimdi;
             document.getElementById('statToplamKg').textContent = bugunKg.toFixed(2);
-            document.getElementById('statToplamYevmiye').textContent = bugunGunluk;
+            document.getElementById('statToplamYevmiye').textContent = bugunYevmiyeSayisi;
 
             const tbody = document.getElementById('sonIslemlerTable');
             const son = [...girisler].sort((a,b) => new Date(b.zaman) - new Date(a.zaman)).slice(0, 10);
@@ -2397,7 +2445,7 @@
 
             // Bind events for dynamic buttons
             document.querySelectorAll('.barkod-btn').forEach(btn => {
-                btn.addEventListener('click', function() { showBarkod(this.dataset.id); });
+                btn.addEventListener('click', function() { showBarkod('all'); });
             });
             document.querySelectorAll('.edit-calisan-btn').forEach(btn => {
                 btn.addEventListener('click', function() { editCalisan(this.dataset.id); });
@@ -2476,21 +2524,78 @@
 
         // ===================== BARKOD =====================
         let currentBarkodCalisanId = null;
-        function showBarkod(id) {
-            const c = DB.get('calisanlar', []).find(x => x.id === id);
-            if (!c) return;
+let selectedBarkodIds = new Set();
+
+function showBarkod(id) {
+    const calisanlar = DB.get('calisanlar', []).filter(c => c.aktif);
+    const previewArea = document.getElementById('barkodPreviewArea');
+    previewArea.innerHTML = '';
+    selectedBarkodIds.clear();
+
+    // Tek bir isci ID'si geldiyse sadece onu, 'all' geldiyse tumunu goster
+    let gosterilecekCalisanlar = [];
+    if (id === 'all') {
+        gosterilecekCalisanlar = calisanlar;
+    } else {
+        const c = calisanlar.find(x => x.id === id);
+        if (c) {
+            gosterilecekCalisanlar = [c];
             currentBarkodCalisanId = id;
-            const previewArea = document.getElementById('barkodPreviewArea');
-            previewArea.innerHTML = '';
-            const card = createBarkodCard(c);
-            previewArea.appendChild(card);
-            setTimeout(() => { JsBarcode('#barkod-svg-' + c.id, c.barkod, { format: "CODE128", lineColor: "#000", width: 2, height: 40, displayValue: false, margin: 0 }); }, 100);
-            openModal('barkodModal');
         }
+    }
+
+    gosterilecekCalisanlar.forEach(c => {
+        const card = createBarkodCard(c);
+        card.addEventListener('click', function() {
+            toggleBarkodSelection(c.id, this);
+        });
+        previewArea.appendChild(card);
+    });
+
+    // Barkodlari render et
+    setTimeout(() => {
+        gosterilecekCalisanlar.forEach(c => {
+            JsBarcode('#barkod-svg-' + c.id, c.barkod, { format: "CODE128", lineColor: "#000", width: 2, height: 40, displayValue: false, margin: 0 });
+        });
+    }, 100);
+
+    openModal('barkodModal');
+}
+
+function toggleBarkodSelection(id, cardElement) {
+    if (selectedBarkodIds.has(id)) {
+        selectedBarkodIds.delete(id);
+        cardElement.classList.remove('selected');
+    } else {
+        selectedBarkodIds.add(id);
+        cardElement.classList.add('selected');
+    }
+}
+
+function selectAllBarkods() {
+    const cards = document.querySelectorAll('.barkod-card');
+    selectedBarkodIds.clear();
+    cards.forEach(card => {
+        const id = card.dataset.id;
+        if (id) {
+            selectedBarkodIds.add(id);
+            card.classList.add('selected');
+        }
+    });
+}
+
+function clearBarkodSelection() {
+    const cards = document.querySelectorAll('.barkod-card');
+    selectedBarkodIds.clear();
+    cards.forEach(card => {
+        card.classList.remove('selected');
+    });
+}
         function createBarkodCard(c) {
             const card = document.createElement('div');
             card.className = 'barkod-card';
-            card.innerHTML = '<div class="barkod-header">SEBAT GÜLYAĞI - TARIM İŞLETMESİ</div><div class="barkod-isci">' + c.ad.toUpperCase() + ' ' + c.soyad.toUpperCase() + '</div><svg id="barkod-svg-' + c.id + '"></svg><div class="barkod-kod">' + c.barkod + '</div>';
+            card.dataset.id = c.id;
+            card.innerHTML = '<div class="barkod-select-indicator"><i class="fas fa-check"></i></div><div class="barkod-header">SEBAT GÜLYAĞI - TARIM İŞLETMESİ</div><div class="barkod-isci">' + c.ad.toUpperCase() + ' ' + c.soyad.toUpperCase() + '</div><svg id="barkod-svg-' + c.id + '"></svg><div class="barkod-kod">' + c.barkod + '</div>';
             return card;
         }
 
@@ -2510,10 +2615,16 @@ function escapeHtml(text) {
 
 function printBarkodlar(mode) {
     const calisanlar = DB.get('calisanlar', []).filter(c => c.aktif);
-
-    // Hangi işçiler yazdırılacak?
     let yazdirilacakCalisanlar = [];
-    if (mode === 'tekli') {
+
+    if (mode === 'secili') {
+        // Seçili olanları yazdır
+        if (selectedBarkodIds.size === 0) {
+            showToast('Yazdırmak için en az bir kart seçin!', 'warning');
+            return;
+        }
+        yazdirilacakCalisanlar = calisanlar.filter(c => selectedBarkodIds.has(c.id));
+    } else if (mode === 'tekli') {
         const c = calisanlar.find(x => x.id === currentBarkodCalisanId);
         if (!c) { showToast('İşçi bulunamadı!', 'error'); return; }
         yazdirilacakCalisanlar = [c];
