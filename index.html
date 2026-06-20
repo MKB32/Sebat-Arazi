@@ -891,6 +891,7 @@
 <base target="_blank">
 <base target="_blank">
 <base target="_blank">
+<base target="_blank">
 </head>
 <body>
 
@@ -3455,11 +3456,6 @@ function printBarkodlar(mode) {
             if (!uygulamaTuru) return; // Eşleşen uygulama türü yoksa ekleme
 
             const uygulamalar = DB.get('uygulamalar', []);
-            const calisanlar = DB.get('calisanlar', []);
-            const araziler = DB.get('araziler', []);
-
-            const calisan = calisanlar.find(c => c.id === calisanId);
-            const arazi = araziler.find(a => a.id === araziId);
 
             // Aynı gün, aynı arazi, aynı iş türü için mevcut kayıt var mı kontrol et
             const mevcutKayit = uygulamalar.find(u => 
@@ -3471,31 +3467,22 @@ function printBarkodlar(mode) {
 
             if (mevcutKayit) {
                 // Mevcut kayda işçi ekle (eğer bu işçi daha önce eklenmemişse)
-                const isciler = mevcutKayit.aciklama.match(/Çalışan İşçi Sayısı: ([0-9]+)/);
-                let mevcutSayi = isciler ? parseInt(isciler[1]) : 1;
-
-                // İşçi listesini kontrol et
                 let isciListesi = mevcutKayit.isci_listesi || [];
                 if (!isciListesi.includes(calisanId)) {
                     isciListesi.push(calisanId);
                     mevcutKayit.isci_listesi = isciListesi;
-                    mevcutKayit.aciklama = uygulamaTuru + ' işlemi yapılmıştır. Çalışan İşçi Sayısı: ' + isciListesi.length + ' kişi. İşçiler: ' + isciListesi.map(id => {
-                        const c = calisanlar.find(x => x.id === id);
-                        return c ? c.ad + ' ' + c.soyad : 'Bilinmiyor';
-                    }).join(', ');
+                    // Sadece iş türü ve çalışan sayısı bilgisi - isimler yok
+                    mevcutKayit.aciklama = uygulamaTuru + ' işlemi yapılmıştır. Çalışan İşçi Sayısı: ' + isciListesi.length + ' kişi.';
                     DB.set('uygulamalar', uygulamalar);
                 }
             } else {
-                // Yeni kayıt oluştur
-                const isciAdi = calisan ? calisan.ad + ' ' + calisan.soyad : 'Bilinmiyor';
-                const araziAdi = arazi ? arazi.arazi_adi : 'Bilinmiyor';
-
+                // Yeni kayıt oluştur - sadece iş türü ve çalışan sayısı
                 const yeniUygulama = {
                     id: uuid(),
                     arazi_id: araziId,
                     uygulama_turu: uygulamaTuru,
                     uygulama_tarihi: tarih,
-                    aciklama: uygulamaTuru + ' işlemi yapılmıştır. Çalışan İşçi Sayısı: 1 kişi. İşçiler: ' + isciAdi,
+                    aciklama: uygulamaTuru + ' işlemi yapılmıştır. Çalışan İşçi Sayısı: 1 kişi.',
                     kaydeden: currentUser ? currentUser.username : 'Sistem',
                     olusturma_tarihi: new Date().toISOString(),
                     otomatik_kayit: true,
