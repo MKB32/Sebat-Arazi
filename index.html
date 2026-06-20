@@ -888,10 +888,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 <base target="_blank">
 <base target="_blank">
-<base target="_blank">
-<base target="_blank">
-<base target="_blank">
-<base target="_blank">
 </head>
 <body>
 
@@ -1409,7 +1405,6 @@
             </div>
             <div class="modal-body" style="padding: 0;">
                 <div class="no-print" style="padding: 20px; background: var(--gray-light); border-bottom: 1px solid var(--gray-border);">
-                    <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
                     <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 12px;">
                         <button class="btn btn-primary" id="btnPrintBarkodSecili"><i class="fas fa-print"></i> Seçili Olanları Yazdır</button>
                         <button class="btn btn-secondary" id="btnPrintBarkodHepsi"><i class="fas fa-print"></i> Tümünü Yazdır</button>
@@ -2026,11 +2021,11 @@
             const tarihStr = tarih || todayStr();
             const yevmiyeHistory = DB.get('yevmiyeHistory', []);
 
-            // Tarih sıralamasıyla en yakın geçmiş kaydı bul
-            const gecmisKayitlar = yevmiyeHistory.filter(h => h.tarih <= tarihStr);
-            gecmisKayitlar.sort((a, b) => b.tarih.localeCompare(a.tarih));
+            // Tarih sıralamasıyla en yakın geçmiş kaydı bul (tarih formatı: YYYY-MM-DD)
+            const gecmisKayitlar = yevmiyeHistory.filter(h => h.tarih && h.tarih <= tarihStr);
+            gecmisKayitlar.sort((a, b) => (b.tarih || '').localeCompare(a.tarih || ''));
 
-            if (gecmisKayitlar.length > 0) {
+            if (gecmisKayitlar.length > 0 && gecmisKayitlar[0].yevmiye) {
                 return gecmisKayitlar[0].yevmiye[isTuru] || gecmisKayitlar[0].yevmiye['Genel İşçilik'] || 500;
             }
 
@@ -2044,11 +2039,11 @@
             const tarihStr = tarih || todayStr();
             const paramHistory = DB.get('paramHistory', []);
 
-            const gecmisKayitlar = paramHistory.filter(h => h.tarih <= tarihStr);
-            gecmisKayitlar.sort((a, b) => b.tarih.localeCompare(a.tarih));
+            const gecmisKayitlar = paramHistory.filter(h => h.tarih && h.tarih <= tarihStr);
+            gecmisKayitlar.sort((a, b) => (b.tarih || '').localeCompare(a.tarih || ''));
 
-            if (gecmisKayitlar.length > 0) {
-                return gecmisKayitlar[0].kgUcreti || 5.00;
+            if (gecmisKayitlar.length > 0 && gecmisKayitlar[0].kgUcreti !== undefined) {
+                return gecmisKayitlar[0].kgUcreti;
             }
 
             return getParametreler().kgUcreti || 5.00;
@@ -2136,12 +2131,13 @@
         // ===================== UYGULAMA AÇIKLAMA TEMİZLİĞİ (V12.1) =====================
 function temizleUygulamaAciklamalari() {
     const uygulamalar = DB.get('uygulamalar', []);
+    if (!Array.isArray(uygulamalar) || uygulamalar.length === 0) return;
     let degisti = false;
     uygulamalar.forEach(u => {
-        if (u.aciklama && u.aciklama.includes('İşçiler:')) {
+        if (u && u.aciklama && typeof u.aciklama === 'string' && u.aciklama.includes('İşçiler:')) {
             const match = u.aciklama.match(/Çalışan İşçi Sayısı: ([0-9]+) kişi/);
-            const sayi = match ? match[1] : (u.isci_listesi ? u.isci_listesi.length : '?');
-            u.aciklama = u.uygulama_turu + ' işlemi yapılmıştır. Çalışan İşçi Sayısı: ' + sayi + ' kişi.';
+            const sayi = match ? match[1] : (Array.isArray(u.isci_listesi) ? u.isci_listesi.length : '1');
+            u.aciklama = (u.uygulama_turu || 'İşlem') + ' işlemi yapılmıştır. Çalışan İşçi Sayısı: ' + sayi + ' kişi.';
             degisti = true;
         }
     });
@@ -2479,7 +2475,7 @@ function checkSession() {
 
             // Bind events for dynamic buttons
             document.querySelectorAll('.barkod-btn').forEach(btn => {
-                btn.addEventListener('click', function() { showBarkod('all'); });
+                btn.addEventListener('click', function() { showBarkod(this.dataset.id); });
             });
             document.querySelectorAll('.edit-calisan-btn').forEach(btn => {
                 btn.addEventListener('click', function() { editCalisan(this.dataset.id); });
@@ -2566,6 +2562,12 @@ function showBarkod(id) {
     previewArea.innerHTML = '';
     selectedBarkodIds.clear();
 
+    if (calisanlar.length === 0) {
+        previewArea.innerHTML = '<div style="padding: 32px; text-align: center; color: var(--gray);">Aktif işçi bulunmuyor</div>';
+        openModal('barkodModal');
+        return;
+    }
+
     // Tek bir isci ID'si geldiyse sadece onu, 'all' geldiyse tumunu goster
     let gosterilecekCalisanlar = [];
     if (id === 'all') {
@@ -2575,6 +2577,9 @@ function showBarkod(id) {
         if (c) {
             gosterilecekCalisanlar = [c];
             currentBarkodCalisanId = id;
+        } else {
+            // Eğer ID bulunamazsa tümünü göster
+            gosterilecekCalisanlar = calisanlar;
         }
     }
 
@@ -2866,6 +2871,7 @@ function printBarkodlar(mode) {
                 acikGiris.cikis_tarihi = new Date().toISOString();
                 acikGiris.durum = 'cikis_yapti';
                 acikGiris.cikis_tipi = 'manuel';
+                if (!acikGiris.is_turu) acikGiris.is_turu = selectedIsTuru;
                 DB.set('girisler', girisler);
                 const girisZamani = new Date(acikGiris.giris_tarihi);
                 const cikisZamani = new Date();
@@ -2919,7 +2925,7 @@ function printBarkodlar(mode) {
             const container = document.getElementById('terminalKayitListesi');
             document.getElementById('bugunKayitSayisi').textContent = girisler.length;
             if (girisler.length === 0) { container.innerHTML = '<div style="padding:24px;text-align:center;color:var(--terminal-muted)">' + (bugunMu ? 'Bugün' : formatDate(t)) + ' için kayıt bulunmuyor</div>'; return; }
-            container.innerHTML = girisler.map(g => {
+            container.innerHTML = girisler.filter(g => g && g.calisan_id).map(g => {
                 const c = calisanlar.find(x => x.id === g.calisan_id);
                 if (!c) return '';
                 let statusClass = 'cikis', statusText = 'Çıkış';
@@ -4253,13 +4259,12 @@ function printBarkodlar(mode) {
             raporGunlukGirisRaporla();
         }
         function raporGunlukGirisRaporla() {
-            const tarih = document.getElementById('raporGunlukTarih').value;
+            const tarihEl = document.getElementById('raporGunlukTarih');
+            if (!tarihEl) return;
+            const tarih = tarihEl.value;
             if (!tarih) return;
 
-            // Önce otomatik çıkış kontrolü yap
-            kontrolOtomatikCikis();
-
-            const girisler = DB.get('girisler', []).filter(g => g.tarih === tarih).sort((a,b) => new Date(b.zaman) - new Date(a.zaman));
+            const girisler = DB.get('girisler', []).filter(g => g && g.tarih === tarih).sort((a,b) => new Date(b.zaman || b.giris_tarihi) - new Date(a.zaman || a.giris_tarihi));
             const calisanlar = DB.get('calisanlar', []);
             let content = '';
             if (girisler.length === 0) { content = '<div style="padding:32px;text-align:center;color:var(--gray)">Bu tarih için kayıt bulunmuyor</div>'; }
