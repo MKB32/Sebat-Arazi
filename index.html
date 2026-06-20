@@ -1315,6 +1315,7 @@
                                 <button class="btn btn-secondary rapor-btn" data-rapor="hasat" style="justify-content:center; padding: 24px; flex-direction: column; gap: 8px;"><i class="fas fa-weight-hanging" style="font-size: 1.5rem;"></i> Hasat/Toplama Raporu</button>
                                 <button class="btn btn-secondary rapor-btn" data-rapor="yillik" style="justify-content:center; padding: 24px; flex-direction: column; gap: 8px;"><i class="fas fa-calendar-alt" style="font-size: 1.5rem;"></i> Yıllık Özet Raporu</button>
                                 <button class="btn btn-secondary rapor-btn" data-rapor="araodeme" style="justify-content:center; padding: 24px; flex-direction: column; gap: 8px;"><i class="fas fa-hand-holding-usd" style="font-size: 1.5rem;"></i> Ara Ödeme Raporu</button>
+                                <button class="btn btn-secondary rapor-btn" data-rapor="gunlukcalisma" style="justify-content:center; padding: 24px; flex-direction: column; gap: 8px;"><i class="fas fa-hard-hat" style="font-size: 1.5rem;"></i> Günlük Çalışma Raporu</button>
                             </div>
                             <div id="raporContent"></div>
                         </div>
@@ -1955,6 +1956,19 @@
         function initData() {
             migrateFromV11();
 
+            // === V12.1: Eski uygulama açıklamalarını temizle (isim listelerini kaldır) ===
+            const uygulamalar = DB.get('uygulamalar', []);
+            let degisti = false;
+            uygulamalar.forEach(u => {
+                if (u.aciklama && u.aciklama.includes('İşçiler:')) {
+                    const match = u.aciklama.match(/Çalışan İşçi Sayısı: ([0-9]+) kişi/);
+                    const sayi = match ? match[1] : '?';
+                    u.aciklama = u.uygulama_turu + ' işlemi yapılmıştır. Çalışan İşçi Sayısı: ' + sayi + ' kişi.';
+                    degisti = true;
+                }
+            });
+            if (degisti) DB.set('uygulamalar', uygulamalar);
+
             const kullanicilar = DB.get('kullanicilar', []);
             if (kullanicilar.length === 0) {
                 DB.set('kullanicilar', [{ id: uuid(), username: 'admin', password: '2329600', rol: 'admin', olusturma_tarihi: new Date().toISOString() }]);
@@ -2119,7 +2133,25 @@
             document.getElementById('loginPassword').value = '';
         }
 
-        function checkSession() {
+        // ===================== UYGULAMA AÇIKLAMA TEMİZLİĞİ (V12.1) =====================
+function temizleUygulamaAciklamalari() {
+    const uygulamalar = DB.get('uygulamalar', []);
+    let degisti = false;
+    uygulamalar.forEach(u => {
+        if (u.aciklama && u.aciklama.includes('İşçiler:')) {
+            const match = u.aciklama.match(/Çalışan İşçi Sayısı: ([0-9]+) kişi/);
+            const sayi = match ? match[1] : (u.isci_listesi ? u.isci_listesi.length : '?');
+            u.aciklama = u.uygulama_turu + ' işlemi yapılmıştır. Çalışan İşçi Sayısı: ' + sayi + ' kişi.';
+            degisti = true;
+        }
+    });
+    if (degisti) {
+        DB.set('uygulamalar', uygulamalar);
+        console.log('Uygulama açıklamaları temizlendi.');
+    }
+}
+
+function checkSession() {
             const session = DB.get('currentSession', null);
             if (session) {
                 const kullanicilar = DB.get('kullanicilar', []);
@@ -2303,6 +2335,7 @@
                         case 'hasat': raporHasat(); break;
                         case 'yillik': raporYillikOzeti(); break;
                         case 'araodeme': raporAraOdeme(); break;
+                        case 'gunlukcalisma': raporGunlukCalisma(); break;
                     }
                 });
             });
@@ -4584,7 +4617,125 @@ function printBarkodlar(mode) {
             content += '</tbody></table></div>';
             document.getElementById('raporYillikContent').innerHTML = content;
         }
-        function raporAraOdeme() {
+        // ===================== GÜNLÜK ÇALIŞMA RAPORU =====================
+function raporGunlukCalisma() {
+    let html = '<div class="card rapor-print">';
+    html += '<div class="card-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">';
+    html += '<div class="card-title"><i class="fas fa-hard-hat"></i> Günlük Çalışma Raporu</div>';
+    html += '<div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">';
+    html += '<label class="no-print" style="font-size:0.875rem;color:var(--gray);font-weight:500;">Başlangıç:</label>';
+    html += '<input type="date" class="form-input no-print" id="raporGunlukBaslangic" style="width:140px;">';
+    html += '<label class="no-print" style="font-size:0.875rem;color:var(--gray);font-weight:500;">Bitiş:</label>';
+    html += '<input type="date" class="form-input no-print" id="raporGunlukBitis" style="width:140px;">';
+    html += '<button class="btn btn-primary btn-sm no-print" id="btnRaporGunlukCalisma"><i class="fas fa-search"></i> Raporla</button>';
+    html += '<button class="btn btn-sm btn-secondary no-print" onclick="window.print()"><i class="fas fa-print"></i> Yazdır</button>';
+    html += '</div></div>';
+    html += '<div class="card-body"><div id="raporGunlukCalismaContent"></div></div></div>';
+    document.getElementById('raporContent').innerHTML = html;
+
+    // Varsayılan tarih aralığı: bu ayın başından bugüne
+    const now = new Date();
+    const baslangic = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+    const bitis = now.toISOString().split('T')[0];
+    document.getElementById('raporGunlukBaslangic').value = baslangic;
+    document.getElementById('raporGunlukBitis').value = bitis;
+
+    document.getElementById('btnRaporGunlukCalisma').addEventListener('click', raporGunlukCalismaRaporla);
+    document.getElementById('raporGunlukBaslangic').addEventListener('change', raporGunlukCalismaRaporla);
+    document.getElementById('raporGunlukBitis').addEventListener('change', raporGunlukCalismaRaporla);
+    raporGunlukCalismaRaporla();
+}
+
+function raporGunlukCalismaRaporla() {
+    const baslangic = document.getElementById('raporGunlukBaslangic').value;
+    const bitis = document.getElementById('raporGunlukBitis').value;
+
+    if (!baslangic || !bitis) {
+        document.getElementById('raporGunlukCalismaContent').innerHTML = '<div style="padding:32px;text-align:center;color:var(--gray)">Lütfen başlangıç ve bitiş tarihi seçin</div>';
+        return;
+    }
+
+    const girisler = DB.get('girisler', []).filter(g => g.durum !== 'yasak');
+    const calisanlar = DB.get('calisanlar', []);
+    const araziler = DB.get('araziler', []);
+
+    // Tarih aralığına göre filtrele
+    const filtreliGirisler = girisler.filter(g => g.tarih >= baslangic && g.tarih <= bitis);
+
+    // Gün bazlı gruplama
+    const gunluk = {};
+    filtreliGirisler.forEach(g => {
+        if (!gunluk[g.tarih]) gunluk[g.tarih] = {};
+        const isTuru = g.is_turu || 'Genel İşçilik';
+        if (!gunluk[g.tarih][isTuru]) gunluk[g.tarih][isTuru] = { isciler: new Set(), arazi_id: g.arazi_id };
+        gunluk[g.tarih][isTuru].isciler.add(g.calisan_id);
+    });
+
+    let content = '';
+    const gunSayisi = Object.keys(gunluk).length;
+
+    if (gunSayisi === 0) {
+        content = '<div style="padding:32px;text-align:center;color:var(--gray)">Seçilen tarih aralığında çalışma kaydı bulunmuyor</div>';
+    } else {
+        // Özet kart
+        let toplamIslem = 0;
+        let toplamIsci = new Set();
+        Object.values(gunluk).forEach(gun => {
+            Object.values(gun).forEach(islem => {
+                toplamIslem++;
+                islem.isciler.forEach(id => toplamIsci.add(id));
+            });
+        });
+
+        content = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:24px;">';
+        content += '<div class="stat-card"><div class="stat-icon blue"><i class="fas fa-calendar-day"></i></div><div><div class="stat-value">' + gunSayisi + '</div><div class="stat-label">Çalışma Günü</div></div></div>';
+        content += '<div class="stat-card"><div class="stat-icon green"><i class="fas fa-tools"></i></div><div><div class="stat-value">' + toplamIslem + '</div><div class="stat-label">Toplam İşlem</div></div></div>';
+        content += '<div class="stat-card"><div class="stat-icon purple"><i class="fas fa-users"></i></div><div><div class="stat-value">' + toplamIsci.size + '</div><div class="stat-label">Farklı İşçi</div></div></div>';
+        content += '</div>';
+
+        // Gün bazlı detay
+        const siraliGunler = Object.keys(gunluk).sort();
+        siraliGunler.forEach(tarih => {
+            const gun = gunluk[tarih];
+            content += '<div style="background:white;border:1px solid var(--gray-border);border-radius:var(--radius);margin-bottom:16px;overflow:hidden;">';
+            content += '<div style="background:var(--primary);color:white;padding:12px 20px;font-weight:700;font-size:1.1rem;display:flex;align-items:center;gap:10px;">';
+            content += '<i class="fas fa-calendar-alt"></i> ' + formatDate(tarih);
+            content += '</div>';
+            content += '<div style="padding:16px 20px;">';
+
+            const isTurleri = Object.keys(gun).sort();
+            isTurleri.forEach(isTuru => {
+                const islem = gun[isTuru];
+                const arazi = araziler.find(a => a.id === islem.arazi_id);
+                const isciSayisi = islem.isciler.size;
+
+                content += '<div style="margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--gray-border);">';
+                content += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">';
+                content += '<span class="badge badge-purple" style="font-size:0.9rem;padding:6px 14px;">' + isTuru + '</span>';
+                content += '<span style="color:var(--gray);font-size:0.875rem;">' + (arazi ? arazi.arazi_adi : '-') + '</span>';
+                content += '<span class="badge badge-blue" style="margin-left:auto;"><i class="fas fa-users"></i> ' + isciSayisi + ' kişi</span>';
+                content += '</div>';
+
+                // Çalışan isimleri
+                content += '<div style="display:flex;flex-wrap:wrap;gap:6px;">';
+                islem.isciler.forEach(cid => {
+                    const c = calisanlar.find(x => x.id === cid);
+                    if (c) {
+                        content += '<span style="background:var(--gray-light);color:var(--dark);padding:4px 10px;border-radius:20px;font-size:0.8rem;font-weight:500;border:1px solid var(--gray-border);">' + c.ad + ' ' + c.soyad + '</span>';
+                    }
+                });
+                content += '</div>';
+                content += '</div>';
+            });
+
+            content += '</div></div>';
+        });
+    }
+
+    document.getElementById('raporGunlukCalismaContent').innerHTML = content;
+}
+
+function raporAraOdeme() {
             let html = '<div class="card rapor-print">';
             html += '<div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">';
             html += '<div class="card-title"><i class="fas fa-hand-holding-usd"></i> Ara Ödeme Raporu</div>';
@@ -4756,6 +4907,7 @@ function printBarkodlar(mode) {
         window.addEventListener('DOMContentLoaded', async () => {
             await initCloudData();
             initEventListeners();
+            temizleUygulamaAciklamalari(); // Eski kayıtları temizle
             otomatikGunKapat(); // Geçmiş günlerin açık kayıtlarını otomatik kapat
             kontrolOtomatikCikis(); // 10 saat kontrolü
             checkSession();
