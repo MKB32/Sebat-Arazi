@@ -2019,6 +2019,8 @@
 
         // Tarih bazlı yevmiye ücreti al
         function getYevmiyeUcreti(isTuru, tarih) {
+            // Götüre İşçilik her zaman 0 TL
+            if (isTuru === 'Götüre İşçilik') return 0;
             const tarihStr = tarih || todayStr();
             const yevmiyeHistory = DB.get('yevmiyeHistory', []);
 
@@ -2884,7 +2886,7 @@ function printBarkodlar(mode) {
             } else {
                 // GİRİŞ İŞLEMİ
                 if (!araziId) { showToast('Aktif arazi bulunamadı! Önce arazi ekleyin.', 'warning'); return; }
-                const ucret = getYevmiyeUcreti(selectedIsTuru, t);
+                const ucret = selectedIsTuru === 'Götüre İşçilik' ? 0 : getYevmiyeUcreti(selectedIsTuru, t);
                 const yeniGiris = { 
                     id: uuid(), calisan_id: calisan.id, arazi_id: araziId, 
                     giris_tarihi: new Date().toISOString(), cikis_tarihi: null, 
@@ -3849,7 +3851,7 @@ function printBarkodlar(mode) {
             });
             let toplamYevmiye = 0; let isTuruHtml = ''; const isTuruOzet = {};
             Object.values(gunluk).forEach(gun => {
-                const ucret = gun.yevmiye; toplamYevmiye += ucret;
+                const ucret = gun.is_turu === 'Götüre İşçilik' ? 0 : gun.yevmiye; toplamYevmiye += ucret;
                 if (!isTuruOzet[gun.is_turu]) isTuruOzet[gun.is_turu] = { gun: 0, tutar: 0 };
                 isTuruOzet[gun.is_turu].gun += 1; isTuruOzet[gun.is_turu].tutar += ucret;
             });
