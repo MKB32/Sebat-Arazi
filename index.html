@@ -888,6 +888,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 <base target="_blank">
 <base target="_blank">
+<base target="_blank">
 </head>
 <body>
 
@@ -1654,8 +1655,8 @@
 
     <script>
         // ===================== SABİTLER =====================
-        const IS_TURLERI = ['Genel İşçilik', 'Gübreleme', 'İlaçlama', 'Sulama', 'Budama', 'Toprak İşleme', 'Ağır İşçilik'];
-        const DEFAULT_YEVMIYE = { 'Genel İşçilik': 500, 'Gübreleme': 550, 'İlaçlama': 600, 'Sulama': 450, 'Budama': 550, 'Toprak İşleme': 600, 'Ağır İşçilik': 750 };
+        const IS_TURLERI = ['Genel İşçilik', 'Gübreleme', 'İlaçlama', 'Sulama', 'Budama', 'Toprak İşleme', 'Ağır İşçilik', 'Götüre İşçilik'];
+        const DEFAULT_YEVMIYE = { 'Genel İşçilik': 500, 'Gübreleme': 550, 'İlaçlama': 600, 'Sulama': 450, 'Budama': 550, 'Toprak İşleme': 600, 'Ağır İşçilik': 750, 'Götüre İşçilik': 0 };
         const AGIR_ISLER = ['Ağır İşçilik'];
         const AYLAR = ['','Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
 
@@ -3488,7 +3489,8 @@ function printBarkodlar(mode) {
                 'Toprak İşleme': 'Toprak İşleme',
                 'Hasat': 'Hasat',
                 'Genel İşçilik': 'Diğer',
-                'Ağır İşçilik': 'Diğer'
+                'Ağır İşçilik': 'Diğer',
+                'Götüre İşçilik': 'Diğer'
             };
 
             const uygulamaTuru = isTuruToUygulama[isTuru];
